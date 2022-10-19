@@ -1,0 +1,38 @@
+From: Gard Spreemann <gspreemann@gmail.com>
+Date: Tue, 2 Apr 2019 11:25:26 +0200
+Subject: Use system LBFGSB.
+
+---
+ scipy/optimize/setup.py | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+Index: scipy/scipy/optimize/setup.py
+===================================================================
+--- scipy.orig/scipy/optimize/setup.py	2021-07-08 15:38:04.651777578 +0200
++++ scipy/scipy/optimize/setup.py	2021-07-08 15:38:04.643777559 +0200
+@@ -63,8 +63,10 @@
+         pre_build_hook = None
+ 
+     lapack = combine_dict(lapack, numpy_nodepr_api)
++    lapack.setdefault('libraries', [])
++    lapack['libraries'].append('lbfgsb')
+ 
+-    sources = ['lbfgsb.pyf', 'lbfgsb.f', 'linpack.f', 'timer.f']
++    sources = ['lbfgsb.pyf']
+     ext = config.add_extension('_lbfgsb',
+                                sources=[join('lbfgsb_src', x)
+                                         for x in sources],
+Index: scipy/scipy/optimize/tests/test_optimize.py
+===================================================================
+--- scipy.orig/scipy/optimize/tests/test_optimize.py	2021-07-08 15:38:04.651777578 +0200
++++ scipy/scipy/optimize/tests/test_optimize.py	2021-07-08 15:38:04.643777559 +0200
+@@ -896,7 +896,8 @@
+         sol = optimize.minimize(optimize.rosen, np.array([-1.2, 1.0]),
+                                 method='L-BFGS-B', jac=optimize.rosen_der,
+                                 options={'disp': False, 'maxls': 1})
+-        assert_(not sol.success)
++        assert_(sol.success)
++        assert_allclose(sol.x,[1,1],rtol=1e-5)
+ 
+     def test_minimize_l_bfgs_b_maxfun_interruption(self):
+         # gh-6162

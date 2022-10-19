@@ -1,0 +1,18 @@
+#!/bin/sh
+set -efu
+echo "=== testing "$(basename $0)" ==="
+
+PYS=${PYS:-"$(py3versions -r 2>/dev/null)"}
+TESTMODE=${TESTMODE:-full}
+TESTPKG=${TESTPKG:-scipy}
+export HOME=$AUTOPKGTEST_TMP
+export TMPDIR=$AUTOPKGTEST_TMP
+
+cd "$AUTOPKGTEST_TMP"
+
+# test imports and a fast test
+for py in $PYS; do
+    echo "=== Testing: $py $TESTPKG ==="
+    $py -c "import scipy.interpolate, scipy.stats, scipy.ndimage; scipy.interpolate.test()" 2>&1
+    echo "=== Done: $py $TESTPKG ==="
+done

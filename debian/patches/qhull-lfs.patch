@@ -1,0 +1,26 @@
+From: Julian Taylor <jtaylor.debian@googlemail.com>
+Date: Mon, 12 Oct 2015 15:17:23 -0700
+Subject: enable large file support
+
+ probably not needed as the file open api of qhull is not available in python
+Forwarded: no
+
+Patch-Name: qhull-lfs.patch
+---
+ scipy/spatial/setup.py | 3 +++
+ 1 file changed, 3 insertions(+)
+
+Index: scipy/scipy/spatial/setup.py
+===================================================================
+--- scipy.orig/scipy/spatial/setup.py	2021-07-08 15:38:00.047766627 +0200
++++ scipy/scipy/spatial/setup.py	2021-07-08 15:38:00.043766618 +0200
+@@ -53,6 +53,9 @@
+     config.add_extension('qhull',
+                          sources=['qhull.c', 'qhull_misc.c'] + qhull_src,
+                          **cfg)
++    cfg.setdefault('define_macros', []).append(('_FILE_OFFSET_BITS','64'))
++    cfg.setdefault('define_macros', []).append(('_LARGEFILE_SOURCE','1'))
++    cfg.setdefault('define_macros', []).append(('_LARGEFILE64_SOURCE','1'))
+ 
+     # cKDTree
+     ckdtree_src = ['query.cxx',

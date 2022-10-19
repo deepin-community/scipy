@@ -1,0 +1,14 @@
+Document: python-scipy-doc
+Title: SciPy Manual
+Author: The SciPy community
+Abstract: This guide is intended as an introductory overview of SciPy
+ and explains how to install and make use of the most important
+ features of SciPy.
+ There is also a tutorial and an API reference manual which details
+ functions, modules, and objects included in SciPy, describing what 
+ they are and what they do.
+Section: Programming/Python
+
+Format: HTML
+Index: /usr/share/doc/python-scipy-doc/html/index.html
+Files: /usr/share/doc/python-scipy-doc/html/*

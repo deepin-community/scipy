@@ -1,0 +1,405 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: SciPy
+Source: http://www.scipy.org/
+
+Files: *
+Copyright: 2003-2019 SciPy Developers
+ 1999-2005 Travis Oliphant
+ 2001-2002 Enthought, Inc.
+ 2002 Eric Jones
+ 2002 Patrick J. Miller
+ 2002-2003 Jochen Kuepper
+ 2002-2004 Pearu Peterson
+ 2002-2005 Jean-Sebastien Roy
+ 2003-2005 Peter J. Verveer
+ 2003-2006 Ed Schofield
+ 2003-2012 SciPy Developers.
+ 2004 David M. Cooke
+ 2006 Bart Vandereycken
+ 2006 BasSw
+ 2006 Johannes Loehnert
+ 2007 Andrew D Straw
+ 2007 John Travers, Robert Hetland
+ 2007-2008 Damian Eads
+ 2008 Tiziano Zito
+ Gary Strangman
+ 2010 Pauli Virtanen
+ 2010, 2011 Pim Schellart
+ 2009 Yosef Meller
+License: BSD-3-clause
+Comment: the files in scipy/io/tests/data/*.sav are IDL formatted test data files
+ and can be read with the functions in scipy/io/idl.py
+ they contain a EULA notice which is likely invalid and ignored by debian, see
+ also https://lists.debian.org/debian-legal/2014/06/msg00001.html
+
+Files: debian/patches/css_font_OpenSans.patch
+Copyright: 2010-2011, Google Corporation.
+License: Apache-2.0
+Comment:
+ Adapted from https://fonts.googleapis.com/css?family=Open+Sans
+
+Files: doc/scipy-sphinx-theme/_theme/scipy/static/less/*
+ doc/scipy-sphinx-theme/_theme/scipy/static/less/bootstrap/*
+ doc/scipy-sphinx-theme/_theme/scipy/static/img/glyphicons-*
+ doc/scipy-sphinx-theme/_theme/scipy/static/css/spc-bootstrap.css
+Copyright: Copyright 2012 Twitter, Inc
+License: Apache-2.0
+Comment: Twitter Bootstrap v2.3.1 (and generated output CSS files)
+
+Files: doc/scipy-sphinx-theme/_theme/scipy/static/copybutton.js
+Copyright: 2014 PSF (Python Software Foundation)
+License: PSF-2
+Comment: File originates from the cpython source
+ found in Doc/tools/sphinxext/static/copybutton.js
+
+Files: doc/source/_static/scipy-mathjax/*
+Copyright: 2009-2017 The MathJax Consortium
+License: Apache-2.0
+
+Files: doc/sphinxext/* doc/sphinxext/numpydoc/*
+Copyright: 2008 Stefan van der Walt <stefan@mentat.za.net>,
+ Pauli Virtanen <pav@iki.fi>
+License: BSD-2-clause
+
+Files: benchmarks/benchmarks/go_benchmark_functions/*.py
+Copyright: 2013 Andrea Gavana <andrea.gavana@gmail.com>
+License: expat
+Comment: Functions for testing global optimizers,
+ forked from the AMPGO project, https://code.google.com/archive/p/ampgo
+
+Files: scipy/fft/_pocketfft/pocketfft.cxx
+Copyright: 2010-2019 Max-Planck-Society, Martin Reinecke
+ 2019 Peter Bell
+License: BSD-3-clause
+
+Files: scipy/fft/_pocketfft/pocketfft_hdronly.h
+Copyright: 2010-2019 Max-Planck-Society, Martin Reinecke
+ 2019 Peter Bell
+ 2003,2007-2014 Matteo Frigo, Massachusetts Institute of Technology
+License: BSD-3-clause
+
+Files: scipy/linalg/src/id_dist/*
+Copyright: 2014, P.-G. Martinsson, V. Rokhlin, Y. Shkolnisky, M. Tygert
+License: BSD-3-clause
+
+Files: scipy/misc/ascent.dat
+Copyright: public-domain
+License: public-domain
+ No permission whatsoever is needed to copy or use public domain works. Public
+ domain material is available for anyone to use for any purpose, private and
+ commercial. Public domain works can serve as the foundation for new creative
+ works. Public domain works can also be copied and distributed without any
+ permission or paying royalties
+
+Files: scipy/ndimage/*
+Copyright: 2003-2005, Peter J. Verveer
+License: BSD-3-clause
+
+Files: scipy/optimize/_highs/*
+Copyright: 2020 ERGO-Code
+License: Expat
+
+Files: scipy/optimize/lbfgsb_src/*.f
+Copyright: 2011 Ciyou Zhu, Richard Byrd, and Jorge Nocedal <nocedal@ece.nwu.edu>
+License: BSD-generic
+ The version included here (in lbfgsb.f) is 3.0 (released April 25, 2011). It was
+ written by Ciyou Zhu, Richard Byrd, and Jorge Nocedal <nocedal@ece.nwu.edu>. It
+ carries the following condition for use:
+ .
+   """
+   This software is freely available, but we expect that all publications
+   describing work using this software, or all commercial products using it,
+   quote at least one of the references given below. This software is released
+   under the BSD License.
+ .
+   References
+     * R. H. Byrd, P. Lu and J. Nocedal. A Limited Memory Algorithm for Bound
+       Constrained Optimization, (1995), SIAM Journal on Scientific and
+       Statistical Computing, 16, 5, pp. 1190-1208.
+     * C. Zhu, R. H. Byrd and J. Nocedal. L-BFGS-B: Algorithm 778: L-BFGS-B,
+       FORTRAN routines for large scale bound constrained optimization (1997),
+       ACM Transactions on Mathematical Software, 23, 4, pp. 550 - 560.
+     * J.L. Morales and J. Nocedal. L-BFGS-B: Remark on Algorithm 778: L-BFGS-B,
+       FORTRAN routines for large scale bound constrained optimization (2011),
+       ACM Transactions on Mathematical Software, 38, 1.
+   """
+
+Files: scipy/optimize/lbfgsb_src/lbfgsb.pyf
+Copyright: 2004 David M. Cooke <cookedm@physics.mcmaster.ca>
+ 2012 Joonas Paalasmaa
+License: Expat
+
+Files: scipy/sparse/csgraph/_matching.pyx
+Copyright: 1987, A. Volgenant/Amsterdam School of Economics,
+                 University of Amsterdam
+License: BSD-3-clause
+
+Files: scipy/sparse/linalg/dsolve/SuperLU/*
+Copyright: 2003, The Regents of the University of California,
+ through Lawrence Berkeley National Laboratory (subject to receipt
+ of any required approvals from U.S. Dept. of Energy)
+License: BSD-3-clause
+
+Files: scipy/sparse/linalg/eigen/arpack/*
+Copyright: 1996-2008 Rice University,
+ 1996-2008 D.C. Sorensen, R.B. Lehoucq, C. Yang, and K. Maschhoff
+ 2001-2011 Scilab Enterprises, Allan Cornet, Sylvestre Ledru
+ 2007 - Sébastien Fabbro (gentoo patch)
+ 2010 - Jordi Gutiérrez Hermoso (Octave patch)
+License: BSD-3-clause
+
+Files: scipy/spatial/qhull_src/*
+Copyright: 1993-2015, The Geometry Center (University of Minnesota)
+ 1993-2015, C.B. Barber
+License: qhullbsd
+ This software includes Qhull from C.B. Barber and The Geometry Center.
+ Qhull is copyrighted as noted above.  Qhull is free software and may
+ be obtained via http from www.qhull.org.  It may be freely copied, modified,
+ and redistributed under the following conditions:
+ .
+ 1. All copyright notices must remain intact in all files.
+ .
+ 2. A copy of this text file must be distributed along with any copies
+    of Qhull that you redistribute; this includes copies that you have
+    modified, or copies of programs or other software products that
+    include Qhull.
+ .
+ 3. If you modify Qhull, you must include a notice giving the
+    name of the person performing the modification, the date of
+    modification, and the reason for such modification.
+ .
+ 4. When distributing modified versions of Qhull, or other software
+    products that include Qhull, you must provide notice that the original
+    source code may be obtained as noted above.
+ .
+ 5. There is no warranty or other guarantee of fitness for Qhull, it is
+    provided solely "as is".  Bug reports or fixes may be sent to
+    qhull_bug@qhull.org; the authors may or may not act on them as
+    they desire.
+
+Files: scipy/special/cephes/*
+Copyright: 1984, 1987, 1989, 2000 Stephen L. Moshier
+License: BSD-3-clause
+
+Files: scipy/special/cephes/dd_*.c scipy/special/cephes/dd_*.h
+Copyright: 2003-2009, The Regents of the University of California,
+ through Lawrence Berkeley National Laboratory (subject to receipt of
+ any required approvals from U.S. Dept. of Energy)
+License: BSD-LBNL
+Comment: This work was supported by the Director, Office of Science, Division
+ of Mathematical, Information, and Computational Sciences of the
+ U.S. Department of Energy under contract numbers DE-AC03-76SF00098 and
+ DE-AC02-05CH11231.
+
+Files: scipy/special/Faddeeva.cc scipy/special/Faddeeva.hh
+Copyright: 2012 Massachusetts Institute of Technology
+License: Expat
+
+Files: scipy/_lib/six.py
+Copyright: 2010-2012 Benjamin Peterson
+License: Expat
+
+Files: scipy/_lib/uarray/*
+Copyright: 2018, Quansight-Labs
+License: BSD-3-clause
+
+Files: scipy/_lib/decorator.py
+Copyright: 2005-2015 Michele Simionato <michele.simionato@gmail.com>
+License: bsdlike
+ All rights reserved.
+ .
+ Redistributions of source code must retain the above copyright
+ notice, this list of conditions and the following disclaimer.
+ Redistributions in bytecode form must reproduce the above copyright
+ notice, this list of conditions and the following disclaimer in
+ the documentation and/or other materials provided with the
+ distribution.
+ .
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
+ OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
+ TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
+ USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+ DAMAGE.
+
+License: Apache-2.0
+ Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ use this file except in compliance with the License. You may obtain a copy
+ of the License at
+ .
+     http://www.apache.org/licenses/LICENSE-2.0
+ .
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ License for the specific language governing permissions and limitations
+ under the License.
+ .
+ On Debian systems, the full text of the Apache License, Version 2.0
+ can be found in the file
+ `/usr/share/common-licenses/Apache-2.0'.
+
+License: BSD-2-clause
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions are
+ met:
+ .
+  1. Redistributions of source code must retain the above copyright
+     notice, this list of conditions and the following disclaimer.
+  2. Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in
+     the documentation and/or other materials provided with the
+     distribution.
+ .
+ THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ DISCLAIMED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT,
+ INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+ IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ POSSIBILITY OF SUCH DAMAGE.
+
+License: BSD-3-clause
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions are met:
+ .
+   a. Redistributions of source code must retain the above copyright notice,
+      this list of conditions and the following disclaimer.
+   b. Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in the
+      documentation and/or other materials provided with the distribution.
+   c. Neither the name of Enthought nor the names of the SciPy Developers
+      may be used to endorse or promote products derived from this software
+      without specific prior written permission.
+ .
+ .
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ ARE DISCLAIMED. IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE FOR
+ ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+ DAMAGE.
+
+License: BSD-LBNL
+ 1. Redistribution and use in source and binary forms, with or
+ without modification, are permitted provided that the following
+ conditions are met:
+ .
+ (1) Redistributions of source code must retain the copyright
+ notice, this list of conditions and the following disclaimer.
+ .
+ (2) Redistributions in binary form must reproduce the copyright
+ notice, this list of conditions and the following disclaimer in
+ the documentation and/or other materials provided with the
+ distribution.
+ .
+ (3) Neither the name of the University of California, Lawrence
+ Berkeley National Laboratory, U.S. Dept. of Energy nor the names
+ of its contributors may be used to endorse or promote products
+ derived from this software without specific prior written
+ permission.
+ .
+ 2. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ .
+ 3. You are under no obligation whatsoever to provide any bug fixes,
+ patches, or upgrades to the features, functionality or performance of
+ the source code ("Enhancements") to anyone; however, if you choose to
+ make your Enhancements available either publicly, or directly to
+ Lawrence Berkeley National Laboratory, without imposing a separate
+ written license agreement for such Enhancements, then you hereby grant
+ the following license: a non-exclusive, royalty-free perpetual license
+ to install, use, modify, prepare derivative works, incorporate into
+ other computer software, distribute, and sublicense such enhancements
+ or derivative works thereof, in binary and source code form.
+Comment: modified BSD license
+
+License: Expat
+ Permission is hereby granted, free of charge, to any person obtaining a copy of
+ this software and associated documentation files (the "Software"), to deal in the
+ Software without restriction, including without limitation the rights to use,
+ copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the
+ Software, and to permit persons to whom the Software is furnished to do so,
+ subject to the following conditions:
+ .
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
+ .
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+ FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
+ AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+License: PSF-2
+ PYTHON SOFTWARE FOUNDATION LICENSE VERSION 2
+ .
+ 1. This LICENSE AGREEMENT is between the Python Software Foundation
+ ("PSF"), and the Individual or Organization ("Licensee") accessing and
+ otherwise using this software ("Python") in source or binary form and
+ its associated documentation.
+ .
+ 2. Subject to the terms and conditions of this License Agreement, PSF hereby
+ grants Licensee a nonexclusive, royalty-free, world-wide license to reproduce,
+ analyze, test, perform and/or display publicly, prepare derivative works,
+ distribute, and otherwise use Python alone or in any derivative version,
+ provided, however, that PSF's License Agreement and PSF's notice of copyright,
+ i.e., "Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010,
+ 2011, 2012, 2013 Python Software Foundation; All Rights Reserved" are retained
+ in Python alone or in any derivative version prepared by Licensee.
+ .
+ 3. In the event Licensee prepares a derivative work that is based on
+ or incorporates Python or any part thereof, and wants to make
+ the derivative work available to others as provided herein, then
+ Licensee hereby agrees to include in any such work a brief summary of
+ the changes made to Python.
+ .
+ 4. PSF is making Python available to Licensee on an "AS IS"
+ basis.  PSF MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR
+ IMPLIED.  BY WAY OF EXAMPLE, BUT NOT LIMITATION, PSF MAKES NO AND
+ DISCLAIMS ANY REPRESENTATION OR WARRANTY OF MERCHANTABILITY OR FITNESS
+ FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF PYTHON WILL NOT
+ INFRINGE ANY THIRD PARTY RIGHTS.
+ .
+ 5. PSF SHALL NOT BE LIABLE TO LICENSEE OR ANY OTHER USERS OF PYTHON
+ FOR ANY INCIDENTAL, SPECIAL, OR CONSEQUENTIAL DAMAGES OR LOSS AS
+ A RESULT OF MODIFYING, DISTRIBUTING, OR OTHERWISE USING PYTHON,
+ OR ANY DERIVATIVE THEREOF, EVEN IF ADVISED OF THE POSSIBILITY THEREOF.
+ .
+ 6. This License Agreement will automatically terminate upon a material
+ breach of its terms and conditions.
+ .
+ 7. Nothing in this License Agreement shall be deemed to create any
+ relationship of agency, partnership, or joint venture between PSF and
+ Licensee.  This License Agreement does not grant permission to use PSF
+ trademarks or trade name in a trademark sense to endorse or promote
+ products or services of Licensee, or any third party.
+ .
+ 8. By copying, installing or otherwise using Python, Licensee
+ agrees to be bound by the terms and conditions of this License
+ Agreement.

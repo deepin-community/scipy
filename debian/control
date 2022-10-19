@@ -1,0 +1,81 @@
+Source: scipy
+Section: python
+Priority: optional
+Maintainer: Debian Python Team <team+python@tracker.debian.org>
+Uploaders: Ondrej Certik <ondrej@certik.cz>,
+           David Cournapeau <cournape@gmail.com>,
+           Varun Hiremath <varun@debian.org>
+Build-Depends: cython3 (>= 0.29.18), cython3 (<< 3.0),
+               debhelper-compat (= 13),
+               dh-python,
+               gfortran,
+               libblas-dev,
+               liblapack-dev,
+               liblbfgsb-dev,
+               libsuitesparse-dev (>= 3.1.0-3),
+               python3-all-dev (>= 3.7),
+               python3-decorator,
+               python3-numpy (>= 1:1.16.5), python3-numpy (<< 1:1.23.0),
+               python3-pybind11 (>= 2.4.3), python3-pybind11 (<< 2.8),
+               python3-pytest,
+               python3-setuptools,
+               python3-wheel (<< 0.37.0)
+Build-Depends-Indep: dvipng,
+                     python3-doc,
+                     python3-docutils,
+                     python3-matplotlib,
+                     python3-numpydoc,
+                     python3-pydata-sphinx-theme,
+                     python3-sphinx (>> 3.1),
+                     rdfind,
+                     symlinks,
+                     texlive-latex-base,
+                     texlive-latex-extra
+Standards-Version: 4.5.1
+Homepage: https://www.scipy.org/
+Vcs-Git: https://salsa.debian.org/python-team/packages/scipy.git
+Vcs-Browser: https://salsa.debian.org/python-team/packages/scipy
+
+Package: python3-scipy
+Architecture: any
+Multi-Arch: no
+Depends: python3-decorator,
+         python3-numpy (>= 1:1.16.5),
+         ${misc:Depends},
+         ${python3:Depends},
+         ${shlibs:Depends}
+Recommends: g++ | c++-compiler, python3-pil
+Suggests: python-scipy-doc
+Description: scientific tools for Python 3
+ SciPy supplements the popular NumPy module (python-numpy package), gathering a
+ variety of high level science and engineering modules together as a single
+ package.
+ .
+ SciPy is a set of Open Source scientific and numeric tools for Python. It
+ currently supports special functions, integration, ordinary differential
+ equation (ODE) solvers, gradient optimization, genetic algorithms, parallel
+ programming tools, an expression-to-C++ compiler for fast execution, and
+ others.
+
+Package: python-scipy-doc
+Depends: fonts-open-sans,
+         libjs-jquery,
+         libjs-mathjax,
+         libjs-underscore,
+         ${misc:Depends},
+         ${sphinxdoc:Depends}
+Section: doc
+Architecture: all
+Multi-Arch: foreign
+Description: scientific library for Python - documentation
+ SciPy supplements the popular NumPy module (python-numpy package), gathering a
+ variety of high level science and engineering modules together as a single
+ package.
+ .
+ SciPy is a set of Open Source scientific and numeric tools for Python. It
+ currently supports special functions, integration, ordinary differential
+ equation (ODE) solvers, gradient optimization, genetic algorithms, parallel
+ programming tools, an expression-to-C++ compiler for fast execution, and
+ others.
+ .
+ This package contains documentation for the SciPy library.

@@ -1,0 +1,104 @@
+#!/usr/bin/make -f
+
+export PYBUILD_NAME=scipy
+
+include /usr/share/dpkg/architecture.mk
+
+unexport LDFLAGS
+export FFLAGS="-fPIC"
+export ATLAS=None
+export PATH := $(CURDIR)/debian/extra_bin:$(PATH)
+export SCIPY_USE_PYTHRAN=0
+
+PY3VERS:= $(shell py3versions -v -r debian/control)
+PY3_DEFAULT:= $(shell py3versions -d)
+TMPDIR := $(CURDIR)/build/tmp
+BASE=$(shell pwd)/debian
+
+ifneq (,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
+  export NPY_NUM_BUILD_JOBS = $(patsubst parallel=%,%,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
+endif
+
+%:
+	dh $@ --with python3 --buildsystem=pybuild
+
+override_dh_auto_clean:
+	rm -rf build
+	-rm -rf doc/source/fontList.cache
+	-rm -rf doc/build
+	-rm -rf debian/extra_bin
+	find . -name "*.pyc" -exec rm {} \;
+	dh_clean
+
+override_dh_auto_configure:
+	rm -f cythonize.dat
+	touch scipy/linalg/_generate_pyx.py scipy/special/_generate_pyx.py
+	python3 tools/cythonize.py
+
+build-python%:
+	pybuild -p$* --configure --configure-args "config_fc --noarch build"
+
+override_dh_auto_build-arch: $(PY3VERS:%=build-python%)
+
+override_dh_auto_build-indep: build-$(PY3_DEFAULT)
+	# generate documentation (see comment below) needs compiled scipy
+	(export MPLCONFIGDIR=. ; \
+	PYLIBPATH=`pybuild --print build_dir | grep $(PY3_DEFAULT) | awk '{print $$3}'`; \
+	echo "building docs using PYLIBPATH=$$PYLIBPATH"; \
+	PYTHONPATH=$$PYLIBPATH make -C doc html PYTHONPATH=$$PYLIBPATH PYVER=3)
+
+override_dh_auto_test:
+	echo "Build-time tests will be run after the installation dir is installed"
+
+override_dh_auto_install:
+	dh_auto_install -a -- --install-args "--root $(BASE)/tmp --force --no-compile --install-layout=deb";
+
+override_dh_install-arch:
+	dh_install
+	find debian/python3-scipy -type f -name '*.cpython-3?d*.so' -delete
+
+	# drop all the installed setup.py files
+	find $(BASE)/ -name setup.py -delete
+	find $(BASE)/ -name generate_ufuncs.py -delete
+
+	set -e && for py in $(PY3VERS); do \
+	  ln -sf /usr/lib/python3/dist-packages/decorator.py $(BASE)/python3-scipy/usr/lib/python$$py/dist-packages/scipy/_lib/decorator.py; \
+	done
+
+	dh_numpy3
+ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
+	mkdir -p $(TMPDIR)
+	set -e && for pyvers in $(PY3VERS); do \
+	  AUTOPKGTEST_TMP=$(TMPDIR) \
+	  PYTHONPATH=$(BASE)/python3-scipy/usr/lib/python$$pyvers/dist-packages/ \
+	  PYS=python$$pyvers TESTMODE=fast $(BASE)/tests/python3; \
+	done
+endif
+
+override_dh_fixperms-arch:
+	dh_fixperms
+	set -e; \
+	SAVEIFS=$$IFS; IFS=`printf '\n '` && IFS="$${IFS% }";       \
+	for i in `find debian -mindepth 2 -type f ! -perm 755`; do  \
+	  if head -1 "$$i" | grep -q '^#!' ; then                   \
+	    chmod +x "$$i";                                         \
+	  fi ;                                                      \
+	done; IFS=$$SAVEIFS
+	sed -i '1s|.|#!/usr/bin/python3\n&|' $(BASE)/python3-scipy/usr/lib/python3/dist-packages/scipy/cluster/tests/test_vq.py
+	sed -i '1s|.|#!/usr/bin/python3\n&|' $(BASE)/python3-scipy/usr/lib/python3/dist-packages/scipy/stats/tests/test_stats.py
+	#replace all the usr/bin/env python
+	find $(BASE)/python3-scipy/usr/lib/python3/ -name "*.py" -type f | xargs sed -i -e "1s#usr/bin/env\s\+python\s*\$$#usr/bin/env python3#"
+
+override_dh_installdocs-indep:
+	dh_installdocs -i
+
+	rm -rf debian/python-scipy-doc/usr/share/doc/python-scipy-doc/html/_static/jquery.js
+	dh_link -ppython-scipy-doc /usr/share/javascript/jquery/jquery.js /usr/share/doc/python-scipy-doc/html/_static/jquery.js
+
+	rm -rf debian/python-scipy-doc/usr/share/doc/python-scipy-doc/html/_static/underscore.js
+	dh_link -ppython-scipy-doc /usr/share/javascript/underscore/underscore.js /usr/share/doc/python-scipy-doc/html/_static/underscore.js
+
+	dh_sphinxdoc -i -XMathJax.js
+	find debian/python-scipy-doc/ -name scipy-mathjax | xargs rm -rf
+	rdfind -outputname /dev/null -makesymlinks true -removeidentinode false debian/python-scipy-doc
+	symlinks -r -s -c debian/python-scipy-doc

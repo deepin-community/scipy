@@ -1,0 +1,74 @@
+#!/bin/sh
+set -efu
+
+PYS=${PYS:-"$(py3versions -r 2>/dev/null)"}
+TESTMODE=${TESTMODE:-full}
+TESTPKG=${TESTPKG:-scipy}
+export HOME=$AUTOPKGTEST_TMP
+export TMPDIR=$AUTOPKGTEST_TMP
+
+if [ ${TESTPKG} = "scipy.sparse" ]; then
+    SPARSE="";
+else
+    SPARSE="sparse.";
+fi
+
+if [ ${TESTPKG} = "scipy.spatial" ]; then
+    SPATIAL="";
+else
+    SPATIAL="spatial.";
+fi
+
+cd "$AUTOPKGTEST_TMP"
+#nosetest does not handle knowfailures
+cat << EOF > runtest.py
+import $TESTPKG
+# add failures to skip here
+skip = [
+# i386 failures
+"special.tests.test_mpmath.TestSystematic.test_pcfw",
+"special.tests.test_orthogonal.test_roots_jacobi",
+"linalg.tests.test_solvers.test_solve_generalized_discrete_are",
+# fails with atlas
+"linalg.tests.test_solvers.test_solve_discrete_are",
+# postscriptum on Bug#919929
+"${SPARSE}tests.test_sparsetools.TestInt32Overflow.test_matvecs",
+"${SPARSE}tests.test_sparsetools.TestInt32Overflow.test_dia_matvec",
+"${SPARSE}tests.test_sparsetools.TestInt32Overflow.test_bsr_1_block",
+"${SPARSE}tests.test_sparsetools.TestInt32Overflow.test_bsr_n_block",
+# a new, unresolved bug in matplotlib, see https://github.com/scipy/scipy/issues/9946
+"${SPATIAL}tests.test__plotutils.TestPlotting.test_delaunay",
+"${SPATIAL}tests.test__plotutils.TestPlotting.test_voronoi",
+"${SPATIAL}tests.test__plotutils.TestPlotting.test_convex_hull"
+]
+
+junit = "$TMPDIR/junit.xml"
+r= $TESTPKG.test(label='$TESTMODE', verbose=2, extra_argv=["--junit-xml=" + junit])
+import xml.etree.ElementTree as ET
+ET.parse(junit)
+tree =ET.parse(junit)
+root = tree.getroot()
+errors = []
+for testcase in root:
+    for result in testcase:
+        if result.tag in ("failure", "error"):
+            testid = testcase.attrib["classname"].split("scipy.")[-1] + "." + testcase.attrib["name"]
+            print("skipped:", testid)
+            if testid in skip:
+                del skip[skip.index(testid)]
+            else:
+                print("failed:", testid)
+                errors.append(testid)
+
+print("#errors: %d" % len(errors))
+for s in skip:
+    print("unused skips:", s)
+assert len(errors) == 0
+EOF
+
+
+for py in $PYS; do
+    echo "=== Testing: $py $TESTPKG ==="
+    $py runtest.py 2>&1
+    echo "=== Done: $py $TESTPKG ==="
+done

@@ -1,0 +1,15 @@
+---
+Bug-Database: https://github.com/scipy/scipy/issues
+Bug-Submit: https://github.com/scipy/scipy/issues/new
+Repository: https://github.com/scipy/scipy.git
+Repository-Browse: https://github.com/scipy/scipy
+Registry:
+ - Name: conda:conda-forge
+   Entry: scipy
+ - Name: bio.tools
+   Entry: NA
+   Checked: 2021-08-01
+ - Name: guix
+   Entry: python-scipy
+ - Name: SciCrunch
+   Entry: SCR_008058

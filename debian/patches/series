@@ -1,0 +1,4 @@
+use_local_mathjax.patch
+qhull-lfs.patch
+Use-system-LBFGSB.patch
+docs_skip_panels.patch
