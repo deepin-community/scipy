@@ -1,8 +1,675 @@
-scipy (1.7.1-2) UNRELEASED; urgency=medium
+scipy (1.10.1-2) unstable; urgency=medium
 
-  * update
+  * Team upload.
+  * armhf with openblas: skip test_L3
+    test_svd_return_singular_vectors[shape1-True]
+    test_m_gt_n test_pteqr test_SR1_skip_update
+    test_symmetric_starting_vector
+  * hppa: skip test_bootstrap_against_theory (not enough memory)
+  * x32: skip test_sample (test_qmc.py)
 
- -- Debian Python Team <team+python@tracker.debian.org>  Thu, 14 Jul 2022 13:36:30 +0800
+ -- Drew Parsons <dparsons@debian.org>  Wed, 01 Mar 2023 15:41:11 +0100
+
+scipy (1.10.1-1) unstable; urgency=medium
+
+  * Team upload.
+  * New upstream release.
+    - bug fixes and stability improvements.
+      Upload for bookworm (Bug#1032073).
+    - applies debian patches
+      find_cython3.patch
+      fix_cast_PR17726.patch
+      fix_highs_atomic_PR17777.patch
+      pythran_type_PR16646.patch
+      readonly_interpolate_PR17717.patch
+  * allow optional VERSION argument for debian/get-submodules
+    gbp import-orig, for instance, needs the submodule source to be
+    already downloaded (before reported in debian/changelog).
+    Submodule source is generated strictly for the indicated version
+    if the git tag v$VERSION is available, otherwise git HEAD is used.
+    - document submodule handling in debian/README.source.
+    - note that get-submodules requires rsync
+  * debian/copyright: add entry for submodules/scipy/_lib/boost
+    License: Boost-1.0, 2008 John Maddock (boost/math) and other
+    contributors. scipy only uses boost/math, the submodule will be
+    simplified to booth_math in the future (upstream PR#17432).
+  * x32: skip test_random_generator during build
+  * riscv64 with atlas: skip runtime test test_aligned_mem
+  * debian patch docs_privacy.patch deactivates net analytics sent to
+    views.scientific-python.org. The site itself respects privacy, but
+    traffic monitoring in the middle might breach privacy.
+  * some dataset tests require internet: test_existence_all
+    test_ascent test_face test_electrocardiogram.
+    Run them separately in debian/tests/python3-network.
+
+ -- Drew Parsons <dparsons@debian.org>  Tue, 28 Feb 2023 22:38:09 +0100
+
+scipy (1.10.0-12) unstable; urgency=medium
+
+  * Team upload.
+  * x32: skip test_bounds during build
+  * armhf with openblas: skip intermittently failing tests
+    test_random_complex_exact test_L7 test_sygst
+    test_various_drivers_standard test_various_drivers_generalized
+    test_broyden1 test_broyden2 test_gejsv_general
+    test_BFGS_skip_update test_tolerance_float32
+
+ -- Drew Parsons <dparsons@debian.org>  Sat, 18 Feb 2023 16:12:32 +0100
+
+scipy (1.10.0-11) unstable; urgency=medium
+
+  * Team upload.
+  * x32: skip test_1sample during build
+  * armhf with openblas: skip more failing tests.
+    test_tpqrt_tpmqrt test_cossin_separate test_orcsd_uncsd
+    test_eigs_consistency[20-0.001] test_random_initial_float32
+    test_pdist_out test_lsqr_basic test_pascal test_atol_rtol
+
+ -- Drew Parsons <dparsons@debian.org>  Fri, 17 Feb 2023 22:45:22 +0100
+
+scipy (1.10.0-10) unstable; urgency=medium
+
+  * Team upload.
+  * x32: skip test_0sample during build
+  * armhf with openblas: arch is flaky, tests fail intermittently.
+    Skip test_cdist_out test_cdist_calling_conventions
+    test_orcsd_uncsd[float64] test_L1 test_L4
+    test_random_exact test_random_tall_left test_random_tall_right
+    test_svd_random_state_2[random_state test_svd_random_state_3
+    test_svd_linop test_ElasticRod
+    test_small_sigma_sparse[float32-shape1] test_small_sigma2[float]
+    test_interpolation_misfit_1d test_svds_parameter_k_which[LM-5]
+    test_Small test_failure_to_run_iterations
+    test_precond_inverse[case1] test_examples
+  * Consider using armhf with atlas or blis, not openblas.
+
+ -- Drew Parsons <dparsons@debian.org>  Fri, 17 Feb 2023 10:34:17 +0100
+
+scipy (1.10.0-9) unstable; urgency=medium
+
+  * Team upload.
+  * x32: skip test_0dim during build
+  * armhf with openblas: skip failing sparse.linalg runtime tests
+    eigen/lobpcg: test_MikotaPair test_diagonal[100-4-3] test_maxit
+    eigen/svds: test_svd_random_state_3[random_state*
+    isolve: test_precond_inverse[case1]
+    propack: test_examples
+
+ -- Drew Parsons <dparsons@debian.org>  Wed, 15 Feb 2023 19:36:32 +0100
+
+scipy (1.10.0-8) unstable; urgency=medium
+
+  * Team upload.
+  * x32: skip test_integers_nd during build
+
+ -- Drew Parsons <dparsons@debian.org>  Tue, 14 Feb 2023 23:07:52 +0100
+
+scipy (1.10.0-7) unstable; urgency=medium
+
+  * Team upload.
+  * x32: skip test_perm_discrepancy during build
+
+ -- Drew Parsons <dparsons@debian.org>  Tue, 14 Feb 2023 20:55:41 +0100
+
+scipy (1.10.0-6) unstable; urgency=medium
+
+  * Team upload.
+  * x32: skip test_flexible_input during build
+  * skip failing run-time tests
+    - armhf with openblas: test_cdist_dtype_equivalence
+    - i386 with blis: test_value_subsets test_bug_6139 test_atol[cgs]
+      test_propack test_various_drivers_standard
+      test_trsyl test_gelsy test_hetrd test_hegst test_pftri
+      test_pptrs_pptri_pptrf_ppsv_ppcon[complex
+      test_gees_trsen[complex64] test_gges_tgsen[complex64]
+    - riscv64 with atlas: test_bug_6139
+
+ -- Drew Parsons <dparsons@debian.org>  Tue, 14 Feb 2023 17:24:21 +0100
+
+scipy (1.10.0-5) unstable; urgency=medium
+
+  * Team upload.
+  * skip failing build tests
+    - hurd-i386: test_pdf_nolan_samples[pct_range0-alpha_...
+    - x32: skip build test test_sign
+  * skip failing runtime tests (debian/tests)
+    - i386 with blis: test_random_complex_overdet
+    - armhf with openblas: test_cholesky
+  * reintroduce and update debian patch
+    hppa-boost-long-double-config.patch.
+    Thanks Mattias Ellert. Closes: #1030947.
+
+ -- Drew Parsons <dparsons@debian.org>  Fri, 10 Feb 2023 12:08:00 +0100
+
+scipy (1.10.0-4) unstable; urgency=medium
+
+  * Team upload.
+  * skip more build-time tests
+    - hurd-i386: test_find_peaks_exact test_find_peaks_withnoise
+      test_examples[True-float64] test_rv_sample
+      test_location_scale[pdf
+    - x32: test_basic
+  * update debian/tests
+    - armhf with openblas: skip test_array_smoothing
+    - i386 with blis: skip test_random_complex_exact
+  * debian patch fix_cast_PR17726.patch applies upstream PR17726
+    to fix 32-bit/64-bit casting. Closes: #1029690.
+  * add Breaks: python3-skbio (<< 0.5.8-3~) to aid migration
+
+ -- Drew Parsons <dparsons@debian.org>  Tue, 07 Feb 2023 09:49:03 +0100
+
+scipy (1.10.0-3) unstable; urgency=medium
+
+  * Team upload.
+  * drop scipy/_lib/boost/ from debian/copyright
+    (no longer provided in upstream source)
+  * skip build-time tests
+    - hurd-i386: test_mip1
+    - ia64: test_maxiter_worsening[lgmres]
+    - x32: test_input_validation
+  * update skips in debian/tests:
+    - i386: skip test_simple_overdet_complex with blis
+    - armhf: skip test_rosenbrock_with_no_exception
+  * update debian patch Use-system-LBFGSB.patch for the new meson build
+    Closes: #1030142.
+
+ -- Drew Parsons <dparsons@debian.org>  Fri, 03 Feb 2023 10:48:29 +0100
+
+scipy (1.10.0-2) unstable; urgency=medium
+
+  * Team upload.
+
+  [ Andreas Tille ]
+  * Add missing copyright for submodules
+
+  [ Drew Parsons ]
+  * update debian/tests
+    - i386: fix test skips
+    - armel: skip test_brunnermunzel_normal_dist
+    - armhf with openblas: skip test_pdist_calling_conventions
+      test_pdist_dtype_equivalence test_striding
+    - s390x with atlas: skip test_aligned_mem
+  * debian patch readonly_interpolate_PR17717.patch applies upstream
+    PR17717 to fix interpolate.interpn. Closes: #1029692.
+  * drop debian patch fix_numpy1.24_PR17035.patch (applied upstream)
+
+ -- Drew Parsons <dparsons@debian.org>  Sun, 29 Jan 2023 10:13:42 +0100
+
+scipy (1.10.0-1exp6) experimental; urgency=medium
+
+  * Team upload.
+  * powerpc: skip test_maxiter_worsening[lgmres]
+  * mipsel: skip test_integrator test_double_integrator
+
+ -- Drew Parsons <dparsons@debian.org>  Wed, 25 Jan 2023 11:05:38 +0100
+
+scipy (1.10.0-1exp5) experimental; urgency=medium
+
+  * Team upload.
+  * mipsel skip test_fht_special_cases test_integrality (also mips64el)
+  * armel skip test_brunnermunzel_normal_dist
+  * riscv64 skip test_maxiter_worsening[lgmres]
+
+ -- Drew Parsons <dparsons@debian.org>  Tue, 24 Jan 2023 12:37:59 +0100
+
+scipy (1.10.0-1exp4) experimental; urgency=medium
+
+  * Team upload.
+  * debian patch fix_highs_atomic_PR17777.patch applies upstream
+    PR17777 to fix handling of libatomic (with gcc) in _highs.
+    Fixes build for armel, mipsel, powerpc.
+  * skip tests on mips64el: test_integrator test_double_integrator
+
+ -- Drew Parsons <dparsons@debian.org>  Mon, 23 Jan 2023 23:01:47 +0100
+
+scipy (1.10.0-1exp3) experimental; urgency=medium
+
+  * Team upload.
+  * skip more tests:
+    - i386: test_examples[True-float64]
+      test_pdf_nolan_samples[pct_range0-alpha_range0-beta_range0]
+    - ppc64: test_maxiter_worsening
+
+ -- Drew Parsons <dparsons@debian.org>  Mon, 23 Jan 2023 12:39:03 +0100
+
+scipy (1.10.0-1exp2) experimental; urgency=medium
+
+  * Team upload.
+  * Build-Depends: libblas-dev not libopenblas-dev. Preferred BLAS
+    implementation must be installed by the system administrator not
+    at build time, and OpenBLAS is not available on all arches.
+  * handle failing tests, see https://github.com/scipy/scipy/issues/17839
+    - relax more tolerances in debian patch manage_tests.patch to enable
+      i386 to pass tests
+    - i386: skip test_x0_equals_Mb[bicgstab]
+      test_rv_sample test_location_scale[pdf
+    - s390x: skip test_atol[bicg]
+    - ppc64: skip test_precond_dummy
+    - armhf (in debian/tests, build-time tests pass fine)
+
+ -- Drew Parsons <dparsons@debian.org>  Mon, 23 Jan 2023 02:41:59 +0100
+
+scipy (1.10.0-1exp1) experimental; urgency=medium
+
+  [ Drew Parsons ]
+  * Team upload.
+  * New upstream major release.
+    - no longer uses local boost source
+      (drop debian patch hppa-boost-long-double-config.patch)
+    - Build-Depends: meson (>= 0.62.2~)
+    - Build-Depends-Indep: python3-sphinx-tabs for docs
+    - update versioned Build-Depends: cython3 (>= 0.29.21~),
+      python3-pythran (>= 0.9.12~), python3-pythran (<< 0.12)
+  * update debian/watch with uversionmangle=s/rc/~rc/ to order
+    RC releases below final release versions
+
+  [ Andreas Tille ]
+  * Standards-Version: 4.6.2 (routine-update)
+  * Multi-Arch: foreign
+  * Reorder sequence of d/control fields by cme (routine-update)
+  * Add salsa-ci file (routine-update)
+  * Rules-Requires-Root: no (routine-update)
+  * Fix field name typo in debian/copyright (Comments ⇒ Comment).
+  * Build-Depends: s/libblas-dev/libopenblas-dev/
+  * Build-Depends: pkg-config
+  * Symlink submodules from submodules source tarball
+  TODO:
+    - Integrate submodules via additional tarball that can be
+      created with script debian/get-submodules
+
+  [ Drew Parsons ]
+  * debian/control: allow use of pythran 0.12
+  * add _build_utils/cythoner.py to find_cython3.patch,
+    see upstream scipy Issue#17808
+  * Build-Depends: python3-mesonpy
+  * Build-Depends: python3-pooch (used by datasets test_data.py)
+    - skip test_data (datasets) pooch tests at build time, which need
+      internet or cached datafiles. test_existence_all, test_ascent,
+      test_face, test_electrocardiogram.
+  * update debian patch manage_tests.patch to only copy .coveragerc if
+    it exists (it is no longer shipped with the source)
+  * debian patch manage_docs.patch enables doc build to complete
+    - drops sphinx_design (not yet packaged for Debian)
+    - ignores imp deprecation warnings (from invoke via pooch, see
+      https://github.com/pyinvoke/invoke/issues/675 and #829)
+    - skips switcher themes (needs updated pydata-sphinx-theme,
+      see Bug##1029009)
+    - don't treat doc warnings as errors. Life is too short for that.
+  * debian patch docs_no_sphinx_design.patch works around the missing
+    sphinx_design extension, replacing docs using grid: with the
+    scipy 1.8 version using panel:, and removing tab-set:.
+  * update debian/copyright: scipy-mathjax, sphinxext no longer
+    present in doc dirs
+  * meson build is still work-in-progress, installs residual cython
+    (pyx) files, see cython_special comments in scipy/special/meson.build
+    So remove any python3.X (not python3) files left after dh_python3.
+    More work is needed to manage these cython files, see
+    https://github.com/scipy/scipy/issues/14890
+
+ -- Drew Parsons <dparsons@debian.org>  Fri, 20 Jan 2023 11:47:47 +0100
+
+scipy (1.8.1-22) unstable; urgency=medium
+
+  * Team upload.
+  * skip test_atol[bicg] on s390x. Closes: #1029550.
+
+ -- Drew Parsons <dparsons@debian.org>  Wed, 25 Jan 2023 15:32:10 +0100
+
+scipy (1.8.1-21) unstable; urgency=medium
+
+  * Team upload.
+  * debian patch fix_numpy1.24_PR17035.patch applies upstream PR17035
+    to fix build with numpy 1.24. Closes: #1027244
+
+ -- Drew Parsons <dparsons@debian.org>  Thu, 19 Jan 2023 14:54:51 +0100
+
+scipy (1.8.1-20) unstable; urgency=medium
+
+  * Team upload.
+  * Fix sphinx build with Python 3.11
+
+ -- Jochen Sprickerhof <jspricke@debian.org>  Tue, 03 Jan 2023 21:59:59 +0100
+
+scipy (1.8.1-19) unstable; urgency=medium
+
+  * Team upload.
+  * Add upstream patch to fix flapack (Closes: #1027460)
+  * Add upstream patch for numpy 1.24
+  * Use dh-sequence-*
+
+ -- Jochen Sprickerhof <jspricke@debian.org>  Tue, 03 Jan 2023 11:32:39 +0100
+
+scipy (1.8.1-18) unstable; urgency=medium
+
+  * Team upload.
+  * Skip one more failing test on ppc64el
+
+ -- Jochen Sprickerhof <jspricke@debian.org>  Mon, 26 Dec 2022 09:33:52 +0100
+
+scipy (1.8.1-17) unstable; urgency=medium
+
+  * Team upload.
+  * Ignore some test in autopkgtests
+
+ -- Jochen Sprickerhof <jspricke@debian.org>  Sun, 25 Dec 2022 12:03:29 +0100
+
+scipy (1.8.1-16) unstable; urgency=medium
+
+  * Team upload.
+  * Ignore some failing unit tests on some archs
+
+ -- Jochen Sprickerhof <jspricke@debian.org>  Fri, 23 Dec 2022 23:53:47 +0100
+
+scipy (1.8.1-15) unstable; urgency=medium
+
+  * Team upload.
+  * Fix FTBFS with new numpy (deprecated numpy.distutils)
+    (Closes: #1026210, #1026342, #1026516)
+  * Add workaround for FTBFS with new sphinx
+  * Ignore test failure on armel (Closes: #1025699)
+
+ -- Jochen Sprickerhof <jspricke@debian.org>  Tue, 20 Dec 2022 19:47:35 +0100
+
+scipy (1.8.1-14) unstable; urgency=medium
+
+  * Team upload.
+  * debian/tests: skip all test_complex* tests on i386 with blis
+  * once again drop pythran support on armhf.
+    Still causes many packages to fail tests even after revised
+    version of PR16646 (possibly due to memory exhaustion?)
+
+ -- Drew Parsons <dparsons@debian.org>  Thu, 08 Sep 2022 16:01:54 +0200
+
+scipy (1.8.1-13) unstable; urgency=medium
+
+  * Team upload.
+  * skip build-time tests
+    - armel: test_random_exact in linalg/tests/test_basic.py (segfaults)
+  * update debian patch pythran_type_PR16646.patch to latest PR16646
+
+ -- Drew Parsons <dparsons@debian.org>  Wed, 07 Sep 2022 09:53:04 +0200
+
+scipy (1.8.1-12) unstable; urgency=medium
+
+  * Team upload.
+  * skip build-time tests
+    - armel: linalg/tests/test_decomp.py (started segfaulting)
+    - hppa: test_nodata test_cont_basic[500-200-semicircular-arg89]
+    - riscv64: test_vector test_iterative_refinements_dense (segfaults)
+  * skip more tests in debian/test
+    - i386 with blis: test_complex_dotc (segfaults)
+    - armhf with openblas: test_solver_selection
+    - ppc64el with atlas: sparse test_svd_v0, test_svd_random_state{_2}
+  * update debian patch pythran_type_PR16646.patch to latest PR16646
+    - reinstate TestMLS tests
+    - reinstate pythran on armhf to test if PR16646 now fixes problems
+    - Closes: #1017862
+
+ -- Drew Parsons <dparsons@debian.org>  Tue, 30 Aug 2022 20:12:18 +0200
+
+scipy (1.8.1-11) unstable; urgency=medium
+
+  * Team upload.
+  * skip more tests in debian/tests
+    - arm64: test_atol[cgs] with blis
+    - armel: skip linalg test_aligned_mem in test_decomp.py
+    - armhf with openblas: some optimize tests in TestRRSVD, TestDogbox
+    - i386 with blis: test_complex_dotu
+    - ppc64el: test_svds_parameter_tol, test_bug_6139 (with atlas)
+    - s390x with atlas: test_bug_6139, test_solver_select
+    - riscv64: avoid failures and segfaults
+  * skip tests failing on powerpc in stats/tests/test_stats.py:
+    overflow encountered in _hypergeom_*. Skip test_hypergeom_cdf,
+    test_hypergeom_sf, test_nch_hypergeom, test_precision,
+    test_precise, test_less_greater
+  * debian/tests: restrict openblas tests to supported architectures
+    only (i.e. not armel)
+
+ -- Drew Parsons <dparsons@debian.org>  Fri, 26 Aug 2022 00:29:59 +0200
+
+scipy (1.8.1-10) unstable; urgency=medium
+
+  * Team upload.
+  * skip TestSmirnovp (test_kolmogorov) also on hurd-i386
+  * skip test_first_step and test_classes on mips64el
+    (integrate/_ivp/tests/test_ivp.py)
+    See https://github.com/scipy/scipy/issues/16883
+  * skip test_large_rank_deficient on armhf with blis. Segfaults in
+    test_lsq_linear.py::TestBVLS
+  * once again drop pythran support on armhf.
+    It does work successfully, but shifts numerical results enough to
+    break tests on a dozen packages (astropy, pandas, pyfai, skimage etc)
+
+ -- Drew Parsons <dparsons@debian.org>  Wed, 24 Aug 2022 11:43:19 +0200
+
+scipy (1.8.1-9) unstable; urgency=medium
+
+  * Team upload.
+  * drop asyncio_mode=auto from debian patch manage_tests.patch.
+    Only relevant when python3-pytest-asyncio is installed
+    (causes errors if not installed, but scipy doesn't need it)
+  * use runtests.py to manage build-time tests
+  * skip failing tests
+    - signal TestMLS fails due to broken pythran support on 32 bit
+      arches. See Bug#1017862.
+    - special test_kolmogorov.py (TestSmirnovp) segfaults on i386.
+      Closes: Bug#1017864.
+    - stats test_cont_basic[500-200-ncf-arg74] fails with
+      IntegrationWarning. See upstream Issue 14519
+  * update debian/watch (uscan) for latest github format
+
+ -- Drew Parsons <dparsons@debian.org>  Mon, 22 Aug 2022 17:24:17 +0200
+
+scipy (1.8.1-8) unstable; urgency=medium
+
+  * Team upload.
+  * overhaul debian/tests to run debci tests using upstream's
+    runtests.py. Previous approach was overcomplicated and unable to
+    skip test_hermitian_modes for blis on i386. Keep specific skips for
+    BLAS tests but drop general tests previously skipped in order to
+    verify if they still need skipping.
+  * debian patch pythran_type_PR16646.patch applies upstream PR#16646
+    to properly define pythran types for 32 bit arches.
+    - reinstate pythran support on armhf
+  * fix determination of python3 versions in debian/rules
+
+ -- Drew Parsons <dparsons@debian.org>  Mon, 25 Jul 2022 00:20:58 +0200
+
+scipy (1.8.1-7) unstable; urgency=medium
+
+  * Team upload.
+  * drop pythran completely from armhf. Still causes errors from built
+    components even if pythran is not installed at runtime.
+    cf. https://github.com/serge-sans-paille/pythran/issues/2002
+  * reorganise test skip list in debian/tests to ensure i386 properly
+    skips test_hermitian_modes
+
+ -- Drew Parsons <dparsons@debian.org>  Mon, 18 Jul 2022 13:36:40 +0200
+
+scipy (1.8.1-6) unstable; urgency=medium
+
+  * Team upload.
+  * on armhf, demote python3-scipy Depends: pythran to Suggests.
+    Causes armhf debci test failure on dozens of dependent packages,
+    mainly with MemoryError. Only individual tests fail, probably
+    depends on the specific usage.
+
+ -- Drew Parsons <dparsons@debian.org>  Thu, 30 Jun 2022 22:14:11 +0200
+
+scipy (1.8.1-5) unstable; urgency=medium
+
+  * Team upload.
+  * debian/tests: skip more blas-specific tests
+    - armhf/openblas: test_large_rank_deficient and all TestTRF
+      (in optimize/tests/test_lsq_linear.py; times out or segfaults)
+    - armhf/openblas: test_disp in optimize/tests/test_linprog.py
+      (times out)
+    - armhf/atlas: test_aligned_mem in linalg/tests/test_decomp.py
+      (illegal value for DHSEQR parameter)
+    - fix i386 skip of test_hermitian_modes (_eigen not eigen)
+  * update debian patch manage_tests.patch
+    - alpha: special test_round.py skip all
+  * Depends: python3-pythran on all arches. Even arches without full
+    SIMD support should benefit from the dynamic C++ compilation.
+    cf. https://github.com/scipy/scipy/issues/13308#issuecomment-1168579164
+    Closes: #1013568.
+
+ -- Drew Parsons <dparsons@debian.org>  Wed, 29 Jun 2022 01:17:22 +0200
+
+scipy (1.8.1-4) unstable; urgency=medium
+
+  * Team upload.
+  * update debian patch manage_tests.patch
+    - add asyncio_mode=auto to pytest.ini. Required in order to launch
+      tests from toplevel source directory.
+    - hppa (parisc64): io/arff test_arffread.py
+      skip TestNoData
+    - hppa (parisc64): special test_round.py skip all
+    - hurd: platform.machine() is 'i686-AT386', so use
+      machine.startswith('i686') instead of machine=='i686'
+      to skip tests for both i386 (linux) and hurd-i386
+  * return an exit code from scipy.test() otherwise 0 is always
+    returned so test failure is not detected
+  * disable pythran support on i386 because of test errors
+    "TypeError: Invalid call to pythranized function"
+    cf. https://github.com/serge-sans-paille/pythran/issues/1025
+    Revisit once pythran 0.11.0 is packaged.
+  * debian/tests: skip test_hermitian_modes with BLIS on i386
+    (in sparse/linalg/eigen/arpack/arpack.py). Closes: Bug#1003880.
+  * in BLAS tests, only use first alternative for BLAS implementation
+
+ -- Drew Parsons <dparsons@debian.org>  Wed, 15 Jun 2022 18:35:03 +0200
+
+scipy (1.8.1-3) unstable; urgency=medium
+
+  * Team upload.
+  * debian/tests specific blas tests Depend on -dev versions of blas
+    packages in order to not hardcode ABI versions
+    (blis recently bumped to libblis.so.4)
+  * update debian patch manage_tests.patch:
+    - mips64el: fft test_fftlog.py skip test_fht_special_cases
+    - mips64el: sparse/csgraph test_shortest_path.py
+      skip test_NaN_warnings
+    - mips64el: stats test_distributions.py skip test_moments_warnings
+    - on i386 platform.machine() is 'i686' not 'i386'
+    - on armel and armhf platform.machine() is "armv7l' not simply 'arm'
+      Use startswith('arm') not =='arm' to allow the general case.
+    - on powerpc platform.machine() is "ppc"
+  * reinstate handling of nocheck in DEB_BUILD_OPTIONS to run tests
+  * run tests with set -e to ensure errors are not ignored.
+    Closes: #1003417.
+  * debian patch build_sh4_FE.patch ensures FE_UPWARD and FE_DOWNWARD
+    are defined for sh4 architecture. Closes: #1007769.
+  * add pythran support for i386
+
+ -- Drew Parsons <dparsons@debian.org>  Tue, 14 Jun 2022 16:11:24 +0200
+
+scipy (1.8.1-2) experimental; urgency=medium
+
+  * Team upload.
+  * rename debian patch skip_tests.patch to manage_tests.patch and
+    update to increase test successes
+    - all: linalg test_lapack.py test_sygst
+      raise tol from 1e-4 to 2e-4
+    - armel, powerpc: stats test_stats skip various tests
+    - armel: special test_round.py skip all
+    - armel: optimize test_linprog.py skip test_bounds_infeasible_2
+    - armel: interpolate test_fitpack.py skip test_kink
+    - armhf: linalg test_interpolative.py
+      skip test_estimate_spectral_norm_diff
+    - i386: relax tolerance in spatial/transform test_rotation.py
+      and spatial test_distance.pytest_pdist_jensenshannon_iris
+    - i386: sparse/linalg/_isolve test_iterative.py skip
+      test_maxiter_worsening
+    - i386: signal test_spectral.py skip test_nd_axis_m1,
+      test_nd_axis_0
+    - s390x, powerpc, ppc64, sparc64: io/arff test_arffread.py
+      skip TestNoData
+
+ -- Drew Parsons <dparsons@debian.org>  Mon, 13 Jun 2022 01:36:20 +0200
+
+scipy (1.8.1-1) experimental; urgency=medium
+
+  * Team upload.
+  * New upstream release.
+    - Depends: python3-numpy (>= 1:1.17.3~)
+  * Build-Depends: pybuild-plugin-pyproject to use pyproject.toml.
+    Closes: #1008680.
+  * Simplify debian/rules back to minimal dh (with python,sphinxdoc)
+  * drop debian/python3-scipy.install: pybuild/pyproject installs
+    directly into debian package dirs
+  * launch build-time tests from /tmp (needs to start outside the
+    source dir)
+  * debian patch skip_tests.patch skips failing tests
+    - linalg: test_decomp.py TestSchur.test_sort and
+      test_solvers.py test_solve_discrete_are
+      see https://github.com/scipy/scipy/issues/14517
+    - optimize test_optimize.py: test_minimize_l_bfgs_maxls passes but
+      marked as expected to fail
+  * Standards-Version: 4.6.1
+
+ -- Drew Parsons <dparsons@debian.org>  Sun, 12 Jun 2022 02:03:37 +0200
+
+scipy (1.8.0-1exp2) experimental; urgency=medium
+
+  * build scipy with pythran support where available [amd64 arm64 m68k]
+    Depends: python3-pythran [amd64 arm64 m68k]
+    Closes: #991753.
+
+ -- Drew Parsons <dparsons@debian.org>  Tue, 15 Feb 2022 01:41:52 +0100
+
+scipy (1.8.0-1exp1) experimental; urgency=medium
+
+  * Team upload.
+  * New upstream release.
+  * update debian/copyright: vendored libraries SuperLU and arpack
+    used by sparse/linalg are now treated as private via an
+    _underscore prefix (_dsolve, _eigen)
+
+ -- Drew Parsons <dparsons@debian.org>  Fri, 11 Feb 2022 22:05:09 +0100
+
+scipy (1.7.3-2) unstable; urgency=medium
+
+  * Team upload.
+  * debian patch hppa-boost-long-double-config.patch disables
+    LONG_DOUBLE in the boost submodule on hppa. Adapted from the boost
+    patch hppa-long-double-config.patch.
+    See https://github.com/scipy/scipy/issues/15260
+    for discussion of why boost has been vendored for scipy.
+    Closes: #1004197.
+
+ -- Drew Parsons <dparsons@debian.org>  Fri, 11 Feb 2022 12:11:29 +0100
+
+scipy (1.7.3-1) unstable; urgency=medium
+
+  * Team upload.
+  * New upstream release.
+  * Build-Depends-Indep: python3-sphinx-panels
+    Drop debian patch docs_skip_panels.patch. Closes: #991752.
+  * remove upper bound on python3-pybind11 build-dependency. It's not
+    used upstream in dev code, gets applied only to release versions
+    to make local pip virtualenv installations use known-good versions.
+    Closes: #1002065.
+  * remove upper bound in Build-Depends: python3-numpy, python3-wheel
+  * raise versioned Build-Depends python3-numpy (>= 1.21.4) for
+    python3.10 support.
+  * don't compress woff font files. Apply the same
+    override_dh_compress used for numpy.  Closes: #1003282.
+  * add a source lintian override for fortran-si4-11x1x10.dat
+    (source-contains-prebuilt-windows-binary). It's a test data
+    file, not a DOS executable.
+  * Standards-Version: 4.6.0
+  * update debian/copyright
+    - remove deprecated files debian/patches/css_font_OpenSans.patch,
+      doc/scipy-sphinx-theme/*, scipy/_lib/six.py
+    - acknowledge Jonathan Neal's code snippet "font-family: no-parens"
+      from https://codepen.io/jonneal/pen/bXLEdB (MIT licence)
+      in doc/source/_static/scipy.css
+    - scipy/fft/_pocketfft/ licence applies to all _pocketfft not only
+      pocketfft.cxx
+    - scipy/_lib/uarray/ renamed to _uarray
+
+ -- Drew Parsons <dparsons@debian.org>  Sun, 09 Jan 2022 14:11:52 +0100
 
 scipy (1.7.1-2) unstable; urgency=medium
 

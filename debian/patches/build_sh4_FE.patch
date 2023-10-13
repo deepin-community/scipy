@@ -1,0 +1,15 @@
+--- a/scipy/special/_round.h
++++ b/scipy/special/_round.h
+@@ -68,5 +68,12 @@ int fegetround()
+ 
+ #endif
+ 
++/* SH4 is not C99 compliant, see https://github.com/scipy/scipy/issues/15584 */
++#ifndef FE_UPWARD
++#define FE_UPWARD -1
++#endif
++#ifndef FE_DOWNWARD
++#define FE_DOWNWARD -1
++#endif
+ 
+ #endif /* _round.h */

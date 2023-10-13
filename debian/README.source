@@ -1,0 +1,19 @@
+=== submodule source ===
+
+According to https://github.com/scipy/scipy/issues/16331
+some git submodules are needed to build scipy since version 1.9.x
+
+The script debian/get-submodules clones the scipy repository
+initialises the submodules and creates a submodules tarball.
+
+Note, the script requires rsync.
+
+The scipy version used for the submodules is extracted from
+debian/changelog, or alternatively may be specified as a argument to
+this script (gbp import-orig, for instance, needs the submodule source
+to be already downloaded)
+
+Submodule source is generated strictly for the indicated version
+if the git tag v$VERSION is available, otherwise git HEAD is used.
+
+Script Usage:  get-submodules [VERSION]

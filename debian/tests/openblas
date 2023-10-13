@@ -1,7 +1,7 @@
 #!/bin/sh
 set -efu
 ma=$(dpkg-architecture -qDEB_HOST_MULTIARCH)
-blaslib=$(update-alternatives --list libblas.so.3-$ma | grep $(basename $0))
+blaslib=$(update-alternatives --list libblas.so.3-$ma | grep -m1 $(basename $0))
 update-alternatives --set libblas.so.3-$ma $blaslib
 
 echo "=== testing "$(basename $0)" ==="
@@ -10,12 +10,12 @@ echo "=== testing "$(basename $0)" ==="
 PYS=${PYS:-"$(py3versions -d 2>/dev/null)"}
 
 #test only modules that link against libblas
-PYS=$PYS TESTPKG=scipy.odr debian/tests/python3
-PYS=$PYS TESTPKG=scipy.optimize debian/tests/python3
-PYS=$PYS TESTPKG=scipy.spatial debian/tests/python3
-PYS=$PYS TESTPKG=scipy.special debian/tests/python3
-PYS=$PYS TESTPKG=scipy.cluster debian/tests/python3
-PYS=$PYS TESTPKG=scipy.integrate debian/tests/python3
-PYS=$PYS TESTPKG=scipy.interpolate debian/tests/python3
-PYS=$PYS TESTPKG=scipy.sparse debian/tests/python3
-PYS=$PYS TESTPKG=scipy.linalg debian/tests/python3
+PYS=$PYS TESTPKG=odr debian/tests/python3
+PYS=$PYS TESTPKG=optimize debian/tests/python3
+PYS=$PYS TESTPKG=spatial debian/tests/python3
+PYS=$PYS TESTPKG=special debian/tests/python3
+PYS=$PYS TESTPKG=cluster debian/tests/python3
+PYS=$PYS TESTPKG=integrate debian/tests/python3
+PYS=$PYS TESTPKG=interpolate debian/tests/python3
+PYS=$PYS TESTPKG=sparse debian/tests/python3
+PYS=$PYS TESTPKG=linalg debian/tests/python3

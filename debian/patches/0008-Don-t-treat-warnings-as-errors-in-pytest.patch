@@ -1,0 +1,20 @@
+From: Jochen Sprickerhof <jspricke@debian.org>
+Date: Sun, 18 Dec 2022 10:33:23 +0100
+Subject: Don't treat warnings as errors in pytest
+
+---
+ pytest.ini | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/pytest.ini b/pytest.ini
+index a4deb42..3438da8 100644
+--- a/pytest.ini
++++ b/pytest.ini
+@@ -3,7 +3,6 @@ addopts = -l
+ junit_family=xunit2
+ 
+ filterwarnings =
+-    error
+     always::scipy._lib._testutils.FPUModeChangeWarning
+     ignore:.*deprecated and ignored since IPython.*:DeprecationWarning
+     once:.*LAPACK bug 0038.*:RuntimeWarning

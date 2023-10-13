@@ -2,7 +2,7 @@
 set -efu
 echo "=== testing "$(basename $0)" ==="
 
-PYS=${PYS:-"$(py3versions -r 2>/dev/null)"}
+PYS=${PYS:-"$(py3versions -s 2>/dev/null)"}
 TESTMODE=${TESTMODE:-full}
 TESTPKG=${TESTPKG:-scipy}
 export HOME=$AUTOPKGTEST_TMP
