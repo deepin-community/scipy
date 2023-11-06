@@ -1,0 +1,125 @@
+From: Jochen Sprickerhof <jspricke@debian.org>
+Date: Tue, 20 Dec 2022 09:45:22 +0100
+Subject: Remove some documentation referencing the source
+
+These break in sbuild with:
+
+Traceback (most recent call last):
+  File "/usr/lib/python3/dist-packages/sphinx/cmd/build.py", line 281, in build_main
+    app.build(args.force_all, args.filenames)
+  File "/usr/lib/python3/dist-packages/sphinx/application.py", line 341, in build
+    self.builder.build_update()
+  File "/usr/lib/python3/dist-packages/sphinx/builders/__init__.py", line 310, in build_update
+    self.build(to_build,
+  File "/usr/lib/python3/dist-packages/sphinx/builders/__init__.py", line 376, in build
+    self.write(docnames, list(updated_docnames), method)
+  File "/usr/lib/python3/dist-packages/sphinx/builders/__init__.py", line 571, in write
+    self._write_serial(sorted(docnames))
+  File "/usr/lib/python3/dist-packages/sphinx/builders/__init__.py", line 574, in _write_serial
+    with logging.pending_warnings():
+  File "/usr/lib/python3.10/contextlib.py", line 142, in __exit__
+    next(self.gen)
+  File "/usr/lib/python3/dist-packages/sphinx/util/logging.py", line 218, in pending_warnings
+    memhandler.flushTo(logger)
+  File "/usr/lib/python3/dist-packages/sphinx/util/logging.py", line 183, in flushTo
+    logger.handle(record)
+  File "/usr/lib/python3.10/logging/__init__.py", line 1634, in handle
+    self.callHandlers(record)
+  File "/usr/lib/python3.10/logging/__init__.py", line 1696, in callHandlers
+    hdlr.handle(record)
+  File "/usr/lib/python3.10/logging/__init__.py", line 964, in handle
+    rv = self.filter(record)
+  File "/usr/lib/python3.10/logging/__init__.py", line 821, in filter
+    result = f.filter(record)
+  File "/usr/lib/python3/dist-packages/sphinx/util/logging.py", line 499, in filter
+    record.location = get_node_location(location)
+  File "/usr/lib/python3/dist-packages/sphinx/util/logging.py", line 519, in get_node_location
+    source = abspath(source)
+  File "/usr/lib/python3/dist-packages/sphinx/util/osutil.py", line 136, in abspath
+    pathdir = path.abspath(pathdir)
+  File "/usr/lib/python3.10/posixpath.py", line 378, in abspath
+    path = os.fspath(path)
+TypeError: expected str, bytes or os.PathLike object, not StringList
+---
+ doc/source/reference/optimize.qap-2opt.rst          | 8 --------
+ doc/source/reference/optimize.qap-faq.rst           | 8 --------
+ doc/source/reference/sparse.linalg.svds-arpack.rst  | 8 --------
+ doc/source/reference/sparse.linalg.svds-lobpcg.rst  | 8 --------
+ doc/source/reference/sparse.linalg.svds-propack.rst | 8 --------
+ 5 files changed, 40 deletions(-)
+ delete mode 100644 doc/source/reference/optimize.qap-2opt.rst
+ delete mode 100644 doc/source/reference/optimize.qap-faq.rst
+ delete mode 100644 doc/source/reference/sparse.linalg.svds-arpack.rst
+ delete mode 100644 doc/source/reference/sparse.linalg.svds-lobpcg.rst
+ delete mode 100644 doc/source/reference/sparse.linalg.svds-propack.rst
+
+diff --git a/doc/source/reference/optimize.qap-2opt.rst b/doc/source/reference/optimize.qap-2opt.rst
+deleted file mode 100644
+index f2ac70e..0000000
+--- a/doc/source/reference/optimize.qap-2opt.rst
++++ /dev/null
+@@ -1,8 +0,0 @@
+-.. _optimize.qap-2opt:
+-
+-quadratic_assignment(method='2opt')
+-----------------------------------------
+-
+-.. scipy-optimize:function:: scipy.optimize.quadratic_assignment
+-   :impl: scipy.optimize._qap._quadratic_assignment_2opt
+-   :method: 2opt
+diff --git a/doc/source/reference/optimize.qap-faq.rst b/doc/source/reference/optimize.qap-faq.rst
+deleted file mode 100644
+index 385274a..0000000
+--- a/doc/source/reference/optimize.qap-faq.rst
++++ /dev/null
+@@ -1,8 +0,0 @@
+-.. _optimize.qap-faq:
+-
+-quadratic_assignment(method='faq')
+-----------------------------------------
+-
+-.. scipy-optimize:function:: scipy.optimize.quadratic_assignment
+-   :impl: scipy.optimize._qap._quadratic_assignment_faq
+-   :method: faq
+diff --git a/doc/source/reference/sparse.linalg.svds-arpack.rst b/doc/source/reference/sparse.linalg.svds-arpack.rst
+deleted file mode 100644
+index 6651c94..0000000
+--- a/doc/source/reference/sparse.linalg.svds-arpack.rst
++++ /dev/null
+@@ -1,8 +0,0 @@
+-.. _sparse.linalg.svds-arpack:
+-
+-svds(solver='arpack')
+-----------------------------------------
+-
+-.. scipy-optimize:function:: scipy.sparse.linalg.svds
+-   :impl: scipy.sparse.linalg._eigen._svds_doc._svds_arpack_doc
+-   :method: arpack
+diff --git a/doc/source/reference/sparse.linalg.svds-lobpcg.rst b/doc/source/reference/sparse.linalg.svds-lobpcg.rst
+deleted file mode 100644
+index 52e91e6..0000000
+--- a/doc/source/reference/sparse.linalg.svds-lobpcg.rst
++++ /dev/null
+@@ -1,8 +0,0 @@
+-.. _sparse.linalg.svds-lobpcg:
+-
+-svds(solver='lobpcg')
+-----------------------------------------
+-
+-.. scipy-optimize:function:: scipy.sparse.linalg.svds
+-   :impl: scipy.sparse.linalg._eigen._svds_doc._svds_lobpcg_doc
+-   :method: lobpcg
+diff --git a/doc/source/reference/sparse.linalg.svds-propack.rst b/doc/source/reference/sparse.linalg.svds-propack.rst
+deleted file mode 100644
+index ac282f9..0000000
+--- a/doc/source/reference/sparse.linalg.svds-propack.rst
++++ /dev/null
+@@ -1,8 +0,0 @@
+-.. _sparse.linalg.svds-propack:
+-
+-svds(solver='propack')
+-----------------------------------------
+-
+-.. scipy-optimize:function:: scipy.sparse.linalg.svds
+-   :impl: scipy.sparse.linalg._eigen._svds_doc._svds_propack_doc
+-   :method: propack

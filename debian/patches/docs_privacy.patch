@@ -1,0 +1,12 @@
+Index: scipy/doc/source/_templates/layout.html
+===================================================================
+--- scipy.orig/doc/source/_templates/layout.html	2023-02-28 17:30:58.206658200 +0100
++++ scipy/doc/source/_templates/layout.html	2023-02-28 19:46:38.518353656 +0100
+@@ -12,6 +12,6 @@
+ {% extends "!layout.html" %}
+ 
+ {% block extrahead %}
+-    <script defer data-domain="docs.scipy.org" src="https://views.scientific-python.org/js/script.js"></script>
++    <!--script defer data-domain="docs.scipy.org" src="https://views.scientific-python.org/js/script.js"></script-->
+     {{ super() }}
+ {% endblock %}

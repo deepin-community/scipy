@@ -1,0 +1,37 @@
+Index: scipy/doc/source/conf.py
+===================================================================
+--- scipy.orig/doc/source/conf.py	2023-01-19 18:30:16.581879951 +0100
++++ scipy/doc/source/conf.py	2023-01-19 18:31:24.970440822 +0100
+@@ -43,7 +43,6 @@
+     'sphinx.ext.coverage',
+     'sphinx.ext.mathjax',
+     'numpydoc',
+-    'sphinx_design',
+     'scipyoptdoc',
+     'doi_role',
+     'matplotlib.sphinxext.plot_directive',
+@@ -141,13 +140,14 @@
+ # be strict about warnings in our examples, we should write clean code
+ # (exceptions permitted for pedagogical purposes below)
+ warnings.resetwarnings()
+-warnings.filterwarnings('error')
++warnings.filterwarnings('default')
+ # allow these and show them
+ warnings.filterwarnings('default', module='sphinx')  # internal warnings
+ # global weird ones that can be safely ignored
+ for key in (
+         r"OpenSSL\.rand is deprecated",  # OpenSSL package in linkcheck
+         r"distutils Version",  # distutils
++        r"the imp module is deprecated",  # invoke (via pooch)
+         ):
+     warnings.filterwarnings(  # deal with other modules having bad imports
+         'ignore', message=".*" + key, category=DeprecationWarning)
+@@ -181,7 +181,7 @@
+ html_theme_options = {
+   "github_url": "https://github.com/scipy/scipy",
+   "twitter_url": "https://twitter.com/SciPy_team",
+-  "navbar_end": ["theme-switcher", "version-switcher", "navbar-icon-links"],
++#  "navbar_end": ["theme-switcher", "version-switcher", "navbar-icon-links"],
+   "switcher": {
+       "json_url": "https://scipy.github.io/devdocs/_static/version_switcher.json",
+       "version_match": version,

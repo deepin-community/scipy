@@ -32,34 +32,36 @@ Comment: the files in scipy/io/tests/data/*.sav are IDL formatted test data file
  they contain a EULA notice which is likely invalid and ignored by debian, see
  also https://lists.debian.org/debian-legal/2014/06/msg00001.html
 
-Files: debian/patches/css_font_OpenSans.patch
-Copyright: 2010-2011, Google Corporation.
-License: Apache-2.0
-Comment:
- Adapted from https://fonts.googleapis.com/css?family=Open+Sans
-
-Files: doc/scipy-sphinx-theme/_theme/scipy/static/less/*
- doc/scipy-sphinx-theme/_theme/scipy/static/less/bootstrap/*
- doc/scipy-sphinx-theme/_theme/scipy/static/img/glyphicons-*
- doc/scipy-sphinx-theme/_theme/scipy/static/css/spc-bootstrap.css
-Copyright: Copyright 2012 Twitter, Inc
-License: Apache-2.0
-Comment: Twitter Bootstrap v2.3.1 (and generated output CSS files)
-
-Files: doc/scipy-sphinx-theme/_theme/scipy/static/copybutton.js
-Copyright: 2014 PSF (Python Software Foundation)
-License: PSF-2
-Comment: File originates from the cpython source
- found in Doc/tools/sphinxext/static/copybutton.js
-
-Files: doc/source/_static/scipy-mathjax/*
+Files: doc/source/_static/scipy.css
 Copyright: 2009-2017 The MathJax Consortium
-License: Apache-2.0
-
-Files: doc/sphinxext/* doc/sphinxext/numpydoc/*
-Copyright: 2008 Stefan van der Walt <stefan@mentat.za.net>,
- Pauli Virtanen <pav@iki.fi>
-License: BSD-2-clause
+  2019 Jonathan Neal "font-family: no-parens"
+License: Apache-2.0+MIT
+ Code snippet "font-family: no-parens" under MIT licence:
+ Permission is hereby granted, free of charge, to any person obtaining
+ a copy of this software and associated documentation files (the
+ "Software"), to deal in the Software without restriction, including
+ without limitation the rights to use, copy, modify, merge, publish,
+ distribute, sublicense, and/or sell copies of the Software, and to
+ permit persons to whom the Software is furnished to do so, subject to
+ the following conditions:
+ .
+ The above copyright notice and this permission notice shall be
+ included in all copies or substantial portions of the Software.
+ .
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+ BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+ ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ SOFTWARE.
+ .
+ Other parts of scipy.css released under the standard SciPy Apache-2.0
+ licence.
+Comment:
+ Code snippet "font-family: no-parens" retrieved
+ from https://codepen.io/jonneal/pen/bXLEdB (MIT)
 
 Files: benchmarks/benchmarks/go_benchmark_functions/*.py
 Copyright: 2013 Andrea Gavana <andrea.gavana@gmail.com>
@@ -67,9 +69,8 @@ License: expat
 Comment: Functions for testing global optimizers,
  forked from the AMPGO project, https://code.google.com/archive/p/ampgo
 
-Files: scipy/fft/_pocketfft/pocketfft.cxx
-Copyright: 2010-2019 Max-Planck-Society, Martin Reinecke
- 2019 Peter Bell
+Files: scipy/fft/_pocketfft/*
+Copyright: 2010-2019 Max-Planck-Society
 License: BSD-3-clause
 
 Files: scipy/fft/_pocketfft/pocketfft_hdronly.h
@@ -134,13 +135,13 @@ Copyright: 1987, A. Volgenant/Amsterdam School of Economics,
                  University of Amsterdam
 License: BSD-3-clause
 
-Files: scipy/sparse/linalg/dsolve/SuperLU/*
+Files: scipy/sparse/linalg/_dsolve/SuperLU/*
 Copyright: 2003, The Regents of the University of California,
  through Lawrence Berkeley National Laboratory (subject to receipt
  of any required approvals from U.S. Dept. of Energy)
 License: BSD-3-clause
 
-Files: scipy/sparse/linalg/eigen/arpack/*
+Files: scipy/sparse/linalg/_eigen/arpack/*
 Copyright: 1996-2008 Rice University,
  1996-2008 D.C. Sorensen, R.B. Lehoucq, C. Yang, and K. Maschhoff
  2001-2011 Scilab Enterprises, Allan Cornet, Sylvestre Ledru
@@ -195,11 +196,7 @@ Files: scipy/special/Faddeeva.cc scipy/special/Faddeeva.hh
 Copyright: 2012 Massachusetts Institute of Technology
 License: Expat
 
-Files: scipy/_lib/six.py
-Copyright: 2010-2012 Benjamin Peterson
-License: Expat
-
-Files: scipy/_lib/uarray/*
+Files: scipy/_lib/_uarray/*
 Copyright: 2018, Quansight-Labs
 License: BSD-3-clause
 
@@ -227,6 +224,58 @@ License: bsdlike
  TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
  USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  DAMAGE.
+
+Files: submodules/scipy/sparse/linalg/_propack/PROPACK/*
+Copyright: 2005 Rasmus Munk Larsen, Stanford University
+License: BSD-3-clause
+
+Files: submodules/scipy/_lib/unuran/*
+Copyright: 2000-2022 Wolfgang Hoermann and Josef Leydold
+                     Department of Statistics and Mathematics, WU Wien, Austria
+License: BSD-3-Clause
+Comment: The original code that can be obtained at
+          https://statmath.wu.ac.at/unuran/download.html
+         is GPL-2+ but for the usage in scip authors relicensed it under
+         BSD-3-Clause
+
+Files: submodules/scipy/_lib/highs/*
+Copyright: 2021 ERGO-Code
+License: Expat
+
+Files: submodules/scipy/_lib/boost/*
+Copyright: 2008 John Maddock (boost/math)
+ and other contributors
+License: Boost-1.0
+ Boost Software License - Version 1.0 - August 17th, 2003
+ .
+ Permission is hereby granted, free of charge, to any person or
+ organization obtaining a copy of the software and accompanying
+ documentation covered by this license (the "Software") to use,
+ reproduce, display, distribute, execute, and transmit the Software,
+ and to prepare derivative works of the Software, and to permit
+ third-parties to whom the Software is furnished to do so, all subject
+ to the following:
+ .
+ The copyright notices in the Software and this entire statement,
+ including the above license grant, this restriction and the following
+ disclaimer, must be included in all copies of the Software, in whole
+ or in part, and all derivative works of the Software, unless such
+ copies or derivative works are solely in the form of
+ machine-executable object code generated by a source language
+ processor.
+ .
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE AND
+ NON-INFRINGEMENT. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR ANYONE
+ DISTRIBUTING THE SOFTWARE BE LIABLE FOR ANY DAMAGES OR OTHER
+ LIABILITY, WHETHER IN CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT
+ OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ THE SOFTWARE.
+
+Files: submodules/doc/source/_static/scipy-mathjax/*
+Copyright: 2009-2020 The MathJax Consortium
+License: Apache-2.0
 
 License: Apache-2.0
  Licensed under the Apache License, Version 2.0 (the "License"); you may not
