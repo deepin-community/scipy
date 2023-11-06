@@ -1,1 +1,2 @@
-obsolete-url-in-packaging debian/copyright https://code.google.com/archive/p/ampgo
+obsolete-url-in-packaging https://code.google.com/archive/p/ampgo [debian/copyright]
+source-contains-prebuilt-windows-binary [scipy/io/tests/data/fortran-si4-11x1x10.dat]

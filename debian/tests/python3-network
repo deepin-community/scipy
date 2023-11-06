@@ -1,0 +1,7 @@
+#!/bin/sh
+set -efu
+
+PYS=${PYS:-"$(py3versions -s 2>/dev/null)"}
+
+echo "=== testing "$(basename $0)" ==="
+NETMODE=ON debian/tests/python3

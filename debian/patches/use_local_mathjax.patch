@@ -8,15 +8,13 @@ Patch-Name: use_local_mathjax.patch
  doc/source/conf.py | 3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)
 
-Index: scipy/doc/source/conf.py
-===================================================================
---- scipy.orig/doc/source/conf.py	2021-07-08 15:37:55.447755686 +0200
-+++ scipy/doc/source/conf.py	2021-07-08 15:37:55.439755667 +0200
-@@ -214,6 +214,7 @@
+--- a/doc/source/conf.py
++++ b/doc/source/conf.py
+@@ -224,6 +224,7 @@ html_file_suffix = '.html'
  htmlhelp_basename = 'scipy'
  
  mathjax_path = "scipy-mathjax/MathJax.js?config=scipy-mathjax"
 +mathjax_path='/usr/share/javascript/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML'
  
- 
  # -----------------------------------------------------------------------------
+ # Intersphinx configuration

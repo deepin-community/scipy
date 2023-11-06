@@ -1,0 +1,59 @@
+#!/bin/sh -e
+# According to https://github.com/scipy/scipy/issues/16331
+# some git submodules are needed to build scipy since version 1.9.x
+# This script clones the scipy repository initialises the submodules
+# and creates a submodules tarball
+#
+# Note: uses rsync
+
+# The scipy version is extracted from debian/changelog,
+# or alternatively may be specified as a argument to this script
+# (gbp import-orig, for instance, needs the submodule source
+# to be already downloaded)
+#
+# Submodule source is generated strictly for the indicated version
+# if the git tag v$VERSION is available, otherwise git HEAD is used.
+#
+# Usage:  get-submodules [VERSION]
+
+COMPONENT=submodules
+EXT=gz
+
+if [ $(basename $PWD) = "debian" ] ; then
+  cd ..
+fi
+
+VERSION=$1
+if [ "x$VERSION" = "x" ]; then
+  VERSION=$(dpkg-parsechangelog | grep '^Version' | cut -d' ' -f2 | cut -f1 -d-)
+fi
+echo "Preparing submodule source for VERSION=$VERSION"
+
+TMPDIR=$(mktemp -d /tmp/scipy.XXXXXX)
+cd $TMPDIR
+git clone https://github.com/scipy/scipy
+cd scipy
+# Use submodules from the given VERSION, if it is available as a git tag v$VERSION
+git checkout -q v$VERSION || /bin/true
+git submodule update --init
+
+MODULES=$(grep 'path =' .gitmodules | sed 's/^.*path = *//')
+set -x
+mkdir ../scipy-${VERSION}
+cd ../scipy-${VERSION}
+for m in $MODULES ; do
+  mkdir -p $m
+  rsync -a -v ../scipy/$m $(dirname $m)
+done
+cd ..
+pwd
+
+tar caf scipy_${VERSION}.orig-${COMPONENT}.tar.${EXT} scipy-${VERSION}
+
+cat <<EOT
+You can find the submodules tarball scipy_${VERSION}.orig-${COMPONENT}.tar.${EXT}
+in the temporary dir $TMPDIR.
+
+Please inspect the tarball and check licenses in the following directories:
+   $MODULES
+EOT

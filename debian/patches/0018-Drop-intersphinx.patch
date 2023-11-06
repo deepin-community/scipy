@@ -1,0 +1,18 @@
+From: Jochen Sprickerhof <jspricke@debian.org>
+Date: Tue, 3 Jan 2023 14:35:03 +0100
+Subject: Drop intersphinx
+
+---
+ doc/source/conf.py | 1 -
+ 1 file changed, 1 deletion(-)
+
+--- a/doc/source/conf.py
++++ b/doc/source/conf.py
+@@ -42,7 +42,6 @@ extensions = [
+     'sphinx.ext.autosummary',
+     'sphinx.ext.coverage',
+     'sphinx.ext.mathjax',
+-    'sphinx.ext.intersphinx',
+     'numpydoc',
+     'sphinx_design',
+     'scipyoptdoc',
