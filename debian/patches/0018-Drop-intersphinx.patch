@@ -6,9 +6,11 @@ Subject: Drop intersphinx
  doc/source/conf.py | 1 -
  1 file changed, 1 deletion(-)
 
---- a/doc/source/conf.py
-+++ b/doc/source/conf.py
-@@ -42,7 +42,6 @@ extensions = [
+Index: scipy/doc/source/conf.py
+===================================================================
+--- scipy.orig/doc/source/conf.py	2023-07-01 10:29:45.550763283 +0200
++++ scipy/doc/source/conf.py	2023-07-01 10:29:45.546763245 +0200
+@@ -45,7 +45,6 @@
      'sphinx.ext.autosummary',
      'sphinx.ext.coverage',
      'sphinx.ext.mathjax',

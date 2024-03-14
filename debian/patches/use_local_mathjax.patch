@@ -8,9 +8,11 @@ Patch-Name: use_local_mathjax.patch
  doc/source/conf.py | 3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)
 
---- a/doc/source/conf.py
-+++ b/doc/source/conf.py
-@@ -224,6 +224,7 @@ html_file_suffix = '.html'
+Index: scipy/doc/source/conf.py
+===================================================================
+--- scipy.orig/doc/source/conf.py	2023-07-01 10:29:29.906614391 +0200
++++ scipy/doc/source/conf.py	2023-07-01 10:29:29.902614353 +0200
+@@ -238,6 +238,7 @@
  htmlhelp_basename = 'scipy'
  
  mathjax_path = "scipy-mathjax/MathJax.js?config=scipy-mathjax"

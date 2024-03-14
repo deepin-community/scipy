@@ -1,26 +1,31 @@
 Tests: python3
-Depends: build-essential, python3-scipy, python3-pytest, python3-all, python3-all-dev, python3-pil, python3-pooch
+Depends: build-essential, python3-scipy, python3-pytest, python3-all, python3-all-dev,
+ python3-doit, python3-pil, python3-pooch
 
 Tests: python3-network
-Depends: build-essential, python3-scipy, python3-pytest, python3-all, python3-all-dev, python3-pil, python3-pooch
+Depends: build-essential, python3-scipy, python3-pytest, python3-all, python3-all-dev,
+ python3-doit, python3-pil, python3-pooch
 Restrictions: needs-internet
 
 # short test on all python versions including debug
 Tests: python3-smoke
-Depends: python3-scipy, python3-pytest, python3-all
+Depends: python3-scipy, python3-pytest, python3-all, python3-doit
 
 #needs root for update-alternatives, build-essential for libc6-dev (ctype libm.so)
 Tests: openblas
 Restrictions: needs-root
-Depends: build-essential, python3-scipy, python3-pytest, python3, libopenblas-dev
+Depends: build-essential, python3-scipy, python3-pytest, python3, python3-doit,
+ libopenblas-dev
 Architecture: amd64 arm64 armhf i386 powerpc ppc64el ppc64 kfreebsd-i386 kfreebsd-amd64 mips64el riscv64 sparc64 s390x
 
 #needs root for update-alternatives, build-essential for libc6-dev (ctype libm.so)
 Tests: atlas
 Restrictions: needs-root
-Depends: build-essential, python3-scipy, python3-pytest, python3, libatlas-base-dev
+Depends: build-essential, python3-scipy, python3-pytest, python3, python3-doit,
+ libatlas-base-dev
 
 #needs root for update-alternatives, build-essential for libc6-dev (ctype libm.so)
 Tests: blis
 Restrictions: needs-root
-Depends: build-essential, python3-scipy, python3-pytest, python3, libblis-dev
+Depends: build-essential, python3-scipy, python3-pytest, python3, python3-doit,
+ libblis-dev

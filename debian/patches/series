@@ -9,5 +9,5 @@ build_sh4_FE.patch
 0010-Allow-test_svds_parameter_k_which-to-fail-on-armel.patch
 0018-Drop-intersphinx.patch
 manage_docs.patch
-docs_no_sphinx_design.patch
 docs_privacy.patch
+cblas_in_blas.patch

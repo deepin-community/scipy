@@ -1,0 +1,16 @@
+Index: scipy/scipy/meson.build
+===================================================================
+--- scipy.orig/scipy/meson.build	2023-07-01 10:03:36.094420573 +0200
++++ scipy/scipy/meson.build	2023-07-14 10:09:27.571812709 +0200
+@@ -166,7 +166,10 @@
+   # In the future, this should be done automatically for:
+   #   `dependency('blas', modules: cblas)`
+   # see https://github.com/mesonbuild/meson/pull/10921.
+-  cblas = dependency('cblas')
++  #cblas = dependency('cblas')
++  # But in the Debian builds cblas symbols are contained in libblas.so
++  # so we don't want to depend on a separate cblas.
++  cblas = []
+ else
+   cblas = []
+ endif

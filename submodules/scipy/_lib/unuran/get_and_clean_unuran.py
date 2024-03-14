@@ -69,7 +69,26 @@ def _download_unuran(version: str, logger: logging.Logger) -> None:
             if suffix == "tar.gz":
                 try:
                     with tarfile.open(ntf.name, "r") as tar:
-                        tar.extractall(path=dst)
+                        def is_within_directory(directory, target):
+                            
+                            abs_directory = os.path.abspath(directory)
+                            abs_target = os.path.abspath(target)
+                        
+                            prefix = os.path.commonprefix([abs_directory, abs_target])
+                            
+                            return prefix == abs_directory
+                        
+                        def safe_extract(tar, path=".", members=None, *, numeric_owner=False):
+                        
+                            for member in tar.getmembers():
+                                member_path = os.path.join(path, member.name)
+                                if not is_within_directory(path, member_path):
+                                    raise Exception("Attempted Path Traversal in Tar File")
+                        
+                            tar.extractall(path, members, numeric_owner=numeric_owner) 
+                            
+                        
+                        safe_extract(tar, path=dst)
                 finally:
                     # We want to save the tar file as a temporary file and simulataneously
                     # extract it, meaning it will need to be opened in a context manager
@@ -108,7 +127,8 @@ def _download_unuran(version: str, logger: logging.Logger) -> None:
                 shutil.rmtree(base / "unuran" / dir_to_remove)
 
         # Unwanted files.
-        files_to_remove = ["src/unuran.h.in", "acinclude.m4", "aclocal.m4", "autogen.sh", "configure", "COPYING", "INSTALL", "NEWS", "UPGRADE"]
+        files_to_remove = ["src/unuran.h.in", "acinclude.m4", "aclocal.m4", "autogen.sh", "configure",
+                           "COPYING", "INSTALL", "NEWS", "UPGRADE", "src/specfunct/log1p.c"]
         for file_to_remove in files_to_remove:
             if (base / "unuran" / file_to_remove).exists():
                 os.remove(base / "unuran" / file_to_remove)

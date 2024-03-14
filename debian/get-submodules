@@ -48,11 +48,15 @@ done
 cd ..
 pwd
 
-tar caf scipy_${VERSION}.orig-${COMPONENT}.tar.${EXT} scipy-${VERSION}
+TARBALL=scipy_${VERSION}.orig-${COMPONENT}.tar.${EXT}
+
+tar caf ${TARBALL} scipy-${VERSION}
 
 cat <<EOT
+
 You can find the submodules tarball scipy_${VERSION}.orig-${COMPONENT}.tar.${EXT}
-in the temporary dir $TMPDIR.
+in the temporary dir $TMPDIR at path
+${TMPDIR}/${TARBALL}
 
 Please inspect the tarball and check licenses in the following directories:
    $MODULES
