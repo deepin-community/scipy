@@ -7,15 +7,19 @@ TESTPKG=${TESTPKG:-}
 export HOME=$AUTOPKGTEST_TMP
 export TMPDIR=$AUTOPKGTEST_TMP
 
-SUBMODULE=
+SUBMODULE=scipy
 if [ "x${TESTPKG}" != "x" ]; then
-    SUBMODULE="-s ${TESTPKG}";
+    SUBMODULE="scipy.${TESTPKG}";
 fi
 
 MODE=
-if [ "x${TESTMODE}" != "xfull" ]; then
-    MODE="-m full";
-fi
+#if [ "x${TESTMODE}" != "xfull" ]; then
+#    MODE="-m full";
+#fi
+
+# By default use summary report of tests.
+# Set to "-v" for verbose reporting
+VERBOSE_TESTS=""
 
 # some tests are expected to fail
 # so list tests to skip in array variable SKIP_TEST_LIST
@@ -31,13 +35,18 @@ if [ "$arch" = "arm64" ] && update-alternatives --query libblas.so.3-$ma | sed -
     SKIP_TEST_LIST=(${SKIP_TEST_LIST[@]} test_atol[cgs])
 fi
 
+if [ "$arch" = "i386" ] && update-alternatives --query libblas.so.3-$ma | sed -n "/^Value:/p" | grep -q atlas ; then
+    SKIP_TEST_LIST=(${SKIP_TEST_LIST[@]} test_propack)
+fi
+
 if [ "$arch" = "i386" ] && update-alternatives --query libblas.so.3-$ma | sed -n "/^Value:/p" | grep -q blis ; then
     SKIP_TEST_LIST=(${SKIP_TEST_LIST[@]} test_hermitian_modes test_svd_linop \
 	test_complex_nonsymmetric_modes test_standard_nonsymmetric_starting_vector test_general_nonsymmetric_starting_vector \
 	test_complex test_simple_overdet_complex test_random_complex_exact test_random_complex_overdet \
 	test_value_subsets test_bug_6139 test_atol[cgs] test_propack test_various_drivers_standard \
 	test_trsyl test_gelsy test_hetrd test_hegst test_pftri \
-	test_pptrs_pptri_pptrf_ppsv_ppcon[complex test_gees_trsen[complex64] test_gges_tgsen[complex64])
+	test_pptrs_pptri_pptrf_ppsv_ppcon[complex test_gees_trsen[complex64] test_gges_tgsen[complex64] \
+	test_dtypes)
 fi
 
 if [ "$arch" = "armhf" ] && update-alternatives --query libblas.so.3-$ma | sed -n "/^Value:/p" | grep -q openblas ; then
@@ -75,12 +84,9 @@ if [ "$arch" = "armhf" ] && update-alternatives --query libblas.so.3-$ma | sed -
     SKIP_TEST_LIST=(${SKIP_TEST_LIST[@]} test_large_rank_deficient)
 fi
 
-if [ "$arch" = "riscv64" ] && update-alternatives --query libblas.so.3-$ma | sed -n "/^Value:/p" | grep -q atlas ; then
-    SKIP_TEST_LIST=(${SKIP_TEST_LIST[@]} test_bug_6139 test_aligned_mem)
-fi
-
 if [ "$arch" = "armel" ]; then
-    SKIP_TEST_LIST=(${SKIP_TEST_LIST[@]} test_aligned_mem test_decomp test_brunnermunzel_normal_dist)
+    SKIP_TEST_LIST=(${SKIP_TEST_LIST[@]} test_aligned_mem test_decomp test_brunnermunzel_normal_dist test_sparse_dense_divide)
+    SKIP_TEST_LIST=(${SKIP_TEST_LIST[@]} test_some_code_paths test_gh12218)
 fi
 
 
@@ -89,15 +95,16 @@ if [ "$arch" = "armhf" ]; then
     SKIP_TEST_LIST=(${SKIP_TEST_LIST[@]} test_woodbury test_complex_data test_scale_invariance \
 		    test_extreme_domains test_polynomial_reproduction test_vector_data \
 		    test_interpolation_misfit_2d test_smoothing_limit test_pickleable \
-		    test_equivalent_to_rbf_interpolator test_rosenbrock_with_no_exception)
+		    test_equivalent_to_rbf_interpolator test_rosenbrock_with_no_exception \
+		    test_gh12218)
 fi
 
 # some tests broken on i386, see https://github.com/scipy/scipy/issues/17839
 if [ "$arch" = "i386" ]; then
     SKIP_TEST_LIST=(${SKIP_TEST_LIST[@]} test_find_peaks_exact test_find_peaks_withnoise \
 		    test_x0_equals_Mb[bicgstab] test_rv_sample test_location_scale[pdf \
-		    test_examples[True-float64] test_pdf_nolan_samples[pct_range0-alpha_range0-beta_range0] \
-		    ellint_rg_xy0_ipp-ellint_rg_xy0)
+		    test_examples[True-float64] test_pdf_nolan_samples test_cdf_nolan_samples \
+		    ellint_rg_xy0_ipp-ellint_rg_xy0 test_hermitian)
 fi
 
 # Bug#1017864 test_kolmogorov.py segfaults on i386 (including hurd)
@@ -110,14 +117,11 @@ fi
 # https://github.com/scipy/scipy/issues/17839#issuecomment-1400636840
 if [ "$arch" = "mips64el" ]; then
     SKIP_TEST_LIST=(${SKIP_TEST_LIST[@]} test_first_step test_classes test_integrator test_double_integrator)
+    SKIP_TEST_LIST=(${SKIP_TEST_LIST[@]} test_nanminmax)
 fi
 
 if [ "$arch" = "ppc64el" ]; then
     SKIP_TEST_LIST=(${SKIP_TEST_LIST[@]} test_cossin test_cossin_separate testInitialization)
-fi
-
-if [ "$arch" = "s390x" ]; then
-    SKIP_TEST_LIST=(${SKIP_TEST_LIST[@]} test_maxiter_worsening test_atol[bicg])
 fi
 
 if [ "$arch" = "ppc64el" ] || [ "$arch" = "arm64" ]; then
@@ -127,17 +131,28 @@ fi
 if [ "$arch" = "ppc64el" ] && update-alternatives --query libblas.so.3-$ma | sed -n "/^Value:/p" | grep -q atlas ; then
     SKIP_TEST_LIST=(${SKIP_TEST_LIST[@]} test_bug_6139 test_svd_v0 test_svd_random_state test_svd_random_state_2)
 fi
-if [ "$arch" = "s390x" ] && update-alternatives --query libblas.so.3-$ma | sed -n "/^Value:/p" | grep -q atlas ; then
-    SKIP_TEST_LIST=(${SKIP_TEST_LIST[@]} test_bug_6139 test_solver_select test_aligned_mem)
-fi
 
 # avoid segfaults and other failures on riscv64
 if [ "$arch" = "riscv64" ]; then
+    VERBOSE_TESTS="-v"
     SKIP_TEST_LIST=(${SKIP_TEST_LIST[@]} test_kmeans2_high_dim test_krandinit test_kmeans2_kpp_high_dim)
     SKIP_TEST_LIST=(${SKIP_TEST_LIST[@]} test_banded_ode_solvers test_singular_term test_vode test_zvode test_odeint_banded_jacobian test_odeint_banded_jac)
     SKIP_TEST_LIST=(${SKIP_TEST_LIST[@]} test_vector test_iterative_refinements_dense)
     SKIP_TEST_LIST=(${SKIP_TEST_LIST[@]} test_sine_weighted_finite test_sine_weighted_infinite test_cosine_weighted_infinite)
     SKIP_TEST_LIST=(${SKIP_TEST_LIST[@]} test_scalar test_integrate_ppoly test_compare_dense_and_sparse)
+    SKIP_TEST_LIST=(${SKIP_TEST_LIST[@]} test_maxiter_worsening[lgmres] test_milp_timeout_16545)
+fi
+
+if [ "$arch" = "riscv64" ] && update-alternatives --query libblas.so.3-$ma | sed -n "/^Value:/p" | grep -q atlas ; then
+    SKIP_TEST_LIST=(${SKIP_TEST_LIST[@]} test_bug_6139 test_aligned_mem)
+fi
+
+if [ "$arch" = "s390x" ]; then
+    SKIP_TEST_LIST=(${SKIP_TEST_LIST[@]} test_maxiter_worsening test_atol[bicg] test_distance_transform_cdt05)
+fi
+
+if [ "$arch" = "s390x" ] && update-alternatives --query libblas.so.3-$ma | sed -n "/^Value:/p" | grep -q atlas ; then
+    SKIP_TEST_LIST=(${SKIP_TEST_LIST[@]} test_bug_6139 test_solver_select test_aligned_mem)
 fi
 
 # stats/tests/test_continuous_basic.py::test_cont_basic[500-200-ncf-arg74] test fails with IntegrationWarning
@@ -181,8 +196,9 @@ fi
 
 echo "Controlling tests with  \"${NET_TESTS} and ${SKIP_TESTS}\""
 
+cd $TMPDIR
 for py in $PYS; do
     echo "=== Testing: $py $TESTPKG ==="
-    $py runtests.py -n -v ${MODE} ${SUBMODULE} -- -k "${NET_TESTS} and ${SKIP_TESTS}" 2>&1
+    $py -c "import ${SUBMODULE}; ${SUBMODULE}.test(extra_argv=['-k', '${NET_TESTS} and ${SKIP_TESTS}', ${VERBOSE_TESTS}])" 2>&1
     echo "=== Done: $py $TESTPKG ==="
 done

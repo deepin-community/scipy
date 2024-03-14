@@ -7,11 +7,11 @@ Subject: Use system LBFGSB.
  scipy/optimize/setup.py    | 4 +++-
  2 files changed, 4 insertions(+), 5 deletions(-)
 
-diff --git a/scipy/optimize/meson.build b/scipy/optimize/meson.build
-index c7079e7..78a006f 100644
---- a/scipy/optimize/meson.build
-+++ b/scipy/optimize/meson.build
-@@ -100,15 +100,12 @@ lbfgsb_module = custom_target('lbfgsb_module',
+Index: scipy/scipy/optimize/meson.build
+===================================================================
+--- scipy.orig/scipy/optimize/meson.build	2023-07-01 10:14:10.011030216 +0200
++++ scipy/scipy/optimize/meson.build	2023-07-01 10:15:32.259620824 +0200
+@@ -101,14 +101,11 @@
  
  _lbfgsb = py3.extension_module('_lbfgsb',
    [
@@ -22,17 +22,16 @@ index c7079e7..78a006f 100644
    ],
    c_args: numpy_nodepr_api,
    fortran_args: fortran_ignore_warnings,
-   include_directories: [inc_np, inc_f2py],
 -  link_args: version_link_args,
 +  link_args: version_link_args + ['-llbfgsb'],
-   dependencies: [lapack, fortranobject_dep],
+   dependencies: [lapack, blas, fortranobject_dep],
    install: true,
    link_language: 'fortran',
-diff --git a/scipy/optimize/setup.py b/scipy/optimize/setup.py
-index c24ef50..1dabc2b 100644
---- a/scipy/optimize/setup.py
-+++ b/scipy/optimize/setup.py
-@@ -64,8 +64,10 @@ def configuration(parent_package='', top_path=None):
+Index: scipy/scipy/optimize/setup.py
+===================================================================
+--- scipy.orig/scipy/optimize/setup.py	2023-07-01 10:14:10.011030216 +0200
++++ scipy/scipy/optimize/setup.py	2023-07-01 10:14:10.011030216 +0200
+@@ -64,8 +64,10 @@
          pre_build_hook = None
  
      lapack = combine_dict(lapack, numpy_nodepr_api)
