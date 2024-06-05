@@ -1,3 +1,193 @@
+scipy (1.11.4-10) unstable; urgency=medium
+
+  * Team upload.
+  * update debian/tests
+    - test default python only on riscv64 to avoid timeout
+    - drop atlas BLAS tests, since atlas is deprecated (Bug#1070013),
+      times out on riscv64 and fails specific tests elsewhere
+    - report durations of slowest 20 tests
+
+ -- Drew Parsons <dparsons@debian.org>  Sat, 18 May 2024 20:23:08 +0200
+
+scipy (1.11.4-9) unstable; urgency=medium
+
+  * Team upload.
+  * debian/tests: fix handling of verbose flag (used for riscv64)
+
+ -- Drew Parsons <dparsons@debian.org>  Wed, 15 May 2024 18:49:39 +0200
+
+scipy (1.11.4-8) unstable; urgency=medium
+
+  * Team upload.
+  * multi-Ellipsis indexing in sparse will be dropped in scipy 1.13
+    see https://github.com/scipy/scipy/pull/18541
+    It fails tests now so skip test_multiple_ellipsis_slicing
+    and reinstate later for scipy 1.13. Closes: #1069377.
+
+ -- Drew Parsons <dparsons@debian.org>  Mon, 13 May 2024 18:41:16 +0200
+
+scipy (1.11.4-7) unstable; urgency=medium
+
+  * Team upload.
+  * skip build-time tests
+    - hppa: test_onenormest_linear_operator
+      test_against_anderson_gumbel_r
+      test_gh12218 test_bootstrap_against_R
+      bootstrap_against_itself_1samp[basic-1780]
+      test_bootstrap_against_itself_1samp[percentile-1784]
+      test_bootstrap_against_itself_1samp[BCa-1784]
+    - hurd-i386: test_ttest_many_dims
+
+ -- Drew Parsons <dparsons@debian.org>  Mon, 13 May 2024 15:43:21 +0200
+
+scipy (1.11.4-6) unstable; urgency=medium
+
+  * Team upload.
+  * debian/tests: set default (empty) value of VERBOSE_TESTS
+  * hurd-i386: skip test_gh12218
+
+ -- Drew Parsons <dparsons@debian.org>  Fri, 23 Feb 2024 13:24:19 +0100
+
+scipy (1.11.4-5) unstable; urgency=medium
+
+  * Team upload.
+  * skip build-time tests
+    - hurd-i386: test_logpdf_pdf_consistency
+    - ia64: test_examples[True-complex64] (test_propack)
+    - sparc64: test_milp_timeout_16545
+  * debian/tests: skip failing tests on i386
+    - with atlas: test_propack
+    - with blis: test_dtypes (in sparse/linalg test_lobpcg.py)
+  * debian/tests: run riscv64 tests verbose (-v) to identify
+    which tests are timing out, and skip test_maxiter_worsening[lgmres]
+    to match debian/rules
+
+ -- Drew Parsons <dparsons@debian.org>  Thu, 22 Feb 2024 17:20:19 +0100
+
+scipy (1.11.4-4) unstable; urgency=medium
+
+  * Team upload.
+  * skip test_hermitian (scipy/linalg test_lobpcg) on i386
+  * use EXTRA_TEST_FLAGS (-v) with hurd-i386, hppa and ia64 to
+    identify which tests are failing
+
+ -- Drew Parsons <dparsons@debian.org>  Mon, 19 Feb 2024 15:53:59 +0100
+
+scipy (1.11.4-3) unstable; urgency=medium
+
+  * Team upload.
+  * skip test_gh12218 on armhf
+
+ -- Drew Parsons <dparsons@debian.org>  Sun, 18 Feb 2024 10:20:50 +0100
+
+scipy (1.11.4-2) unstable; urgency=medium
+
+  * Team upload.
+  * skip test_gh12218 on armel
+
+ -- Drew Parsons <dparsons@debian.org>  Sat, 17 Feb 2024 09:49:20 +0100
+
+scipy (1.11.4-1) unstable; urgency=medium
+
+  * Team upload.
+  * New upstream release
+  * skip tests. Closes: #1061605.
+    - armel: test_some_code_paths (stats TestKSTwoSamples)
+    - sparc64: test_distance_transform_cdt05 (ndimage)
+
+ -- Drew Parsons <dparsons@debian.org>  Thu, 15 Feb 2024 14:19:46 +0100
+
+scipy (1.11.1-1exp2) experimental; urgency=medium
+
+  * Team upload.
+  * update debian patch manage_tests.patch to use assert_allclose
+    to compare floating point values in test_bootstrap_alternative in
+    stats test_resampling.py. Needed on i386, see upstream Issue#20043.
+  * skip failing tests
+    - armel: test_sparse_dense_divide
+    - i386: test_pdf_nolan_samples test_cdf_nolan_samples
+    - mips64el: test_nanminmax
+    - riscv64: test_milp_timeout_16545
+    - s390x, hppa, powerpc, ppc64: test_distance_transform_cdt05
+  * update Build-Depends: pkgconf rather than pkg-config
+
+ -- Drew Parsons <dparsons@debian.org>  Thu, 08 Feb 2024 00:59:34 +0100
+
+scipy (1.11.1-1exp1) experimental; urgency=medium
+
+  * Team upload.
+  * New upstream release.
+    - submodule _lib/boost renamed to _lib/boost_math
+    - applies debian patch link_atomics_PR17777.patch
+    - use -m pytest (build-time) and in-python scipy.tests() (runtime
+      debian/tests) to run tests since runtests.py has been removed.
+      Upstream now uses dev.py but it requires pydevtool, which is not
+      yet packaged for debian (RFP Bug#1062827).
+  * x32: skip test_continuing
+  * report full tarball pathname in debian/get-submodules
+    to ease file handling
+  * drop deprecated debian patch docs_no_sphinx_design.patch
+  * update versioned Build-Depends: python3-mesonpy (>= 0.12.1~),
+      python3-numpy (>= 1:1.21.6~),
+      python3-pybind11 (>= 2.10.4~),
+      python3-pythran (>= 0.12.0~)
+  * for docs, Build-Depends-Indep: python3-sphinx-design
+    instead of python3-sphinx-panels,
+  * debian patch cblas_in_blas.patch drops an explicit dependency on
+    cblas (libcblas.so). On Debian the cblas symbols are built into
+    libblas.so.
+  * clean files generated by meson.build (see special/meson.build)
+    Remove python3.* __config__.py, retain the one generated by the
+    default python.
+  * update debian patch manage_docs.patch to drop myst_nb
+    (not yet packaged for debian)
+
+ -- Drew Parsons <dparsons@debian.org>  Sun, 04 Feb 2024 13:03:07 +0100
+
+scipy (1.10.1-10) unstable; urgency=medium
+
+  * Team upload.
+  * rewrite link_atomics_PR17777.patch to only test __atomic_add_fetch
+    and drop __atomic_load_n. PR#17777 had actually already been
+    applied, but gcc on armel does not define __atomic_load_n.
+    see upstream issue #19982.
+
+ -- Drew Parsons <dparsons@debian.org>  Sun, 28 Jan 2024 14:08:13 +0100
+
+scipy (1.10.1-9) unstable; urgency=medium
+
+  * Team upload.
+  * debian patch link_atomics_PR17777.patch applies upstream PR#17777
+    to link to atomics symbols where required (armel).
+
+ -- Drew Parsons <dparsons@debian.org>  Sun, 28 Jan 2024 04:52:33 +0100
+
+scipy (1.10.1-8) unstable; urgency=medium
+
+  * Team upload.
+  * reinstate Build-Depends: python3-pythran
+  * drop python3-scipy Depends: python3-pythran
+    pythran is used at build time, not needed at runtime.
+    Closes: #1020561.
+
+ -- Drew Parsons <dparsons@debian.org>  Sat, 27 Jan 2024 19:07:55 +0100
+
+scipy (1.10.1-7) unstable; urgency=medium
+
+  * Team upload
+  * Build-Depends on cython3-legacy instead of cython3
+    (Closes: #1056888)
+  * Drop dependencies on RC buggy python3-pythran
+
+ -- Graham Inggs <ginggs@debian.org>  Sat, 06 Jan 2024 14:54:22 +0000
+
+scipy (1.10.1-6) unstable; urgency=medium
+
+  * Team upload
+  * Allow building with Python 3.12
+
+ -- Graham Inggs <ginggs@debian.org>  Tue, 05 Dec 2023 13:22:12 +0000
+
 scipy (1.10.1-5) unstable; urgency=medium
 
   * Team upload.

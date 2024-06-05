@@ -107,14 +107,9 @@ import importlib.util
 import errno
 import contextlib
 from sysconfig import get_path
-
-# distutils is required to infer meson install path
-# if this needs to be replaced for Python 3.12 support and there's no
-# stdlib alternative, use CmdAction and the hack discussed in gh-16058
-with warnings.catch_warnings():
-    warnings.filterwarnings("ignore", category=DeprecationWarning)
-    from distutils import dist
-    from distutils.command.install import INSTALL_SCHEMES
+import math
+import traceback
+from concurrent.futures.process import _MAX_WINDOWS_WORKERS
 
 from pathlib import Path
 from collections import namedtuple
@@ -123,7 +118,6 @@ from dataclasses import dataclass
 
 import click
 from click import Option, Argument
-from doit import task_params
 from doit.cmd_base import ModuleTaskLoader
 from doit.reporter import ZeroReporter
 from doit.exceptions import TaskError
@@ -144,9 +138,12 @@ console_theme = Theme({
     "cmd": "italic gray50",
 })
 
-
-class EMOJI:
-    cmd = ":computer:"
+if sys.platform == 'win32':
+    class EMOJI:
+        cmd = ">"
+else:
+    class EMOJI:
+        cmd = ":computer:"
 
 
 rich_click.STYLE_ERRORS_SUGGESTION = "yellow italic"
@@ -269,7 +266,7 @@ def cli(ctx, **kwargs):
 
     \b**python dev.py --build-dir my-build test -s stats**
 
-    """
+    """  # noqa: E501
     CLI.update_context(ctx, kwargs)
 
 
@@ -304,11 +301,18 @@ class Dirs:
         self.root = Path(__file__).parent.absolute()
         if not args:
             return
+
         self.build = Path(args.build_dir).resolve()
         if args.install_prefix:
             self.installed = Path(args.install_prefix).resolve()
         else:
             self.installed = self.build.parent / (self.build.stem + "-install")
+
+        if sys.platform == 'win32' and sys.version_info < (3, 10):
+            # Work around a pathlib bug; these must be absolute paths
+            self.build = Path(os.path.abspath(self.build))
+            self.installed = Path(os.path.abspath(self.installed))
+
         # relative path for site-package with py version
         # i.e. 'lib/python3.10/site-packages'
         self.site = self.get_site_packages()
@@ -325,14 +329,23 @@ class Dirs:
         Depending on whether we have debian python or not,
         return dist_packages path or site_packages path.
         """
-        if 'deb_system' in INSTALL_SCHEMES:
-            # debian patched python in use
-            install_cmd = dist.Distribution().get_command_obj('install')
-            install_cmd.select_scheme('deb_system')
-            install_cmd.finalize_options()
-            plat_path = Path(install_cmd.install_platlib)
-        else:
+        if sys.version_info >= (3, 12):
             plat_path = Path(get_path('platlib'))
+        else:
+            # distutils is required to infer meson install path
+            # for python < 3.12 in debian patched python
+            with warnings.catch_warnings():
+                warnings.filterwarnings("ignore", category=DeprecationWarning)
+                from distutils import dist
+                from distutils.command.install import INSTALL_SCHEMES
+            if 'deb_system' in INSTALL_SCHEMES:
+                # debian patched python in use
+                install_cmd = dist.Distribution().get_command_obj('install')
+                install_cmd.select_scheme('deb_system')
+                install_cmd.finalize_options()
+                plat_path = Path(install_cmd.install_platlib)
+            else:
+                plat_path = Path(get_path('platlib'))
         return self.installed / plat_path.relative_to(sys.exec_prefix)
 
 
@@ -405,7 +418,11 @@ class Build(Task):
     parallel = Option(
         ['--parallel', '-j'], default=None, metavar='N_JOBS',
         help=("Number of parallel jobs for building. "
-              "This defaults to 2 * n_cpus + 2."))
+              "This defaults to the number of available physical CPU cores"))
+    setup_args = Option(
+        ['--setup-args', '-C'], default=[], multiple=True,
+        help=("Pass along one or more arguments to `meson setup` "
+              "Repeat the `-C` in case of multiple arguments."))
     show_build_log = Option(
         ['--show-build-log'], default=False, is_flag=True,
         help="Show build output rather than using a log file")
@@ -437,6 +454,13 @@ class Build(Task):
                 raise RuntimeError("Can't build into non-empty directory "
                                    f"'{build_dir.absolute()}'")
 
+        if sys.platform == "cygwin":
+            # Cygwin only has netlib lapack, but can link against
+            # OpenBLAS rather than netlib blas at runtime.  There is
+            # no libopenblas-devel to enable linking against
+            # openblas-specific functions or OpenBLAS Lapack
+            cmd.extend(["-Dlapack=lapack", "-Dblas=blas"])
+
         build_options_file = (
             build_dir / "meson-info" / "intro-buildoptions.json")
         if build_options_file.exists():
@@ -459,6 +483,9 @@ class Build(Task):
             cmd += ['-Db_coverage=true']
         if args.asan:
             cmd += ['-Db_sanitize=address,undefined']
+        if args.setup_args:
+            cmd += [str(arg) for arg in args.setup_args]
+
         # Setting up meson build
         cmd_str = ' '.join([str(p) for p in cmd])
         cls.console.print(f"{EMOJI.cmd} [cmd] {cmd_str}")
@@ -476,7 +503,12 @@ class Build(Task):
         Build a dev version of the project.
         """
         cmd = ["ninja", "-C", str(dirs.build)]
-        if args.parallel is not None:
+        if args.parallel is None:
+            # Use number of physical cores rather than ninja's default of 2N+2,
+            # to avoid out of memory issues (see gh-17941 and gh-18443)
+            n_cores = cpu_count(only_physical_cores=True)
+            cmd += [f"-j{n_cores}"]
+        else:
             cmd += ["-j", str(args.parallel)]
 
         # Building with ninja-backend
@@ -526,7 +558,7 @@ class Build(Task):
                         log_size = os.stat(log_filename).st_size
                         if log_size > last_log_size:
                             elapsed = datetime.datetime.now() - start_time
-                            print("    ... installation in progress ({0} "
+                            print("    ... installation in progress ({} "
                                   "elapsed)".format(elapsed))
                             last_blip = time.time()
                             last_log_size = log_size
@@ -539,7 +571,7 @@ class Build(Task):
 
         if ret != 0:
             if not args.show_build_log:
-                with open(log_filename, 'r') as f:
+                with open(log_filename) as f:
                     print(f.read())
             print(f"Installation failed! ({elapsed} elapsed)")
             sys.exit(1)
@@ -547,6 +579,11 @@ class Build(Task):
         # ignore everything in the install directory.
         with open(dirs.installed / ".gitignore", "w") as f:
             f.write("*")
+
+        if sys.platform == "cygwin":
+            rebase_cmd = ["/usr/bin/rebase", "--database", "--oblivious"]
+            rebase_cmd.extend(Path(dirs.installed).glob("**/*.dll"))
+            subprocess.check_call(rebase_cmd)
 
         print("Installation OK")
         return
@@ -559,18 +596,39 @@ class Build(Task):
         we use for wheels uploaded to PyPI so that DLL gets loaded.
 
         Assumes pkg-config is installed and aware of OpenBLAS.
+
+        The "dirs" parameter is typically a "Dirs" object with the
+        structure as the following, say, if dev.py is run from the
+        folder "repo":
+
+        dirs = Dirs(
+            root=WindowsPath('C:/.../repo'),
+            build=WindowsPath('C:/.../repo/build'),
+            installed=WindowsPath('C:/.../repo/build-install'),
+            site=WindowsPath('C:/.../repo/build-install/Lib/site-packages'
+            )
+
         """
         # Get OpenBLAS lib path from pkg-config
         cmd = ['pkg-config', '--variable', 'libdir', 'openblas']
         result = subprocess.run(cmd, capture_output=True, text=True)
+        # pkg-config does not return any meaningful error message if fails
         if result.returncode != 0:
-            print(result.stderrr)
-            return result.returncode
+            print('"pkg-config --variable libdir openblas" '
+                  'command did not manage to find OpenBLAS '
+                  'succesfully. Try running manually on the '
+                  'command prompt for more information.')
+            print("OpenBLAS copy failed!")
+            sys.exit(result.returncode)
 
-        openblas_lib_path = Path(result.stdout.strip())
+        # Skip the drive letter of the path -> /c to get Windows drive
+        # to be appended correctly to avoid "C:\c\..." from stdout.
+        openblas_lib_path = Path(result.stdout.strip()[2:]).resolve()
         if not openblas_lib_path.stem == 'lib':
-            raise RuntimeError(
-                f'Expecting "lib" at end of "{openblas_lib_path}"')
+            raise RuntimeError('"pkg-config --variable libdir openblas" '
+                               'command did not return a path ending with'
+                               ' "lib" folder. Instead it returned '
+                               f'"{openblas_lib_path}"')
 
         # Look in bin subdirectory for OpenBLAS binaries.
         bin_path = openblas_lib_path.parent / 'bin'
@@ -580,8 +638,8 @@ class Build(Task):
         libs_path.mkdir(exist_ok=True)
         # Copy DLL files from OpenBLAS install to scipy install .libs subdir.
         for dll_fn in bin_path.glob('*.dll'):
-            out_fname = libs_path / dll_fn.parts[-1]
-            print(f'Copying {dll_fn} to {out_fname}')
+            out_fname = libs_path / dll_fn.name
+            print(f'Copying {dll_fn} ----> {out_fname}')
             out_fname.write_bytes(dll_fn.read_bytes())
 
         # Write _distributor_init.py to scipy install dir;
@@ -589,9 +647,10 @@ class Build(Task):
         # so OpenBLAS gets found
         openblas_support = import_module_from_path(
             'openblas_support',
-            dirs.root / 'tools' / 'openblas_support.py')
+            dirs.root / 'tools' / 'openblas_support.py'
+        )
         openblas_support.make_init(scipy_path)
-        return 0
+        print('OpenBLAS copied')
 
     @classmethod
     def run(cls, add_path=False, **kwargs):
@@ -608,11 +667,7 @@ class Build(Task):
             cls.build_project(dirs, args, env)
             cls.install_project(dirs, args)
             if args.win_cp_openblas and platform.system() == 'Windows':
-                if cls.copy_openblas(dirs) == 0:
-                    print('OpenBLAS copied')
-                else:
-                    print("OpenBLAS copy failed!")
-                    sys.exit(1)
+                cls.copy_openblas(dirs)
 
         # add site to sys.path
         if add_path:
@@ -632,7 +687,7 @@ class Test(Task):
     $ python dev.py test -s cluster -m full --durations 20
     $ python dev.py test -s stats -- --tb=line  # `--` passes next args to pytest
     ```
-    """
+    """  # noqa: E501
     ctx = CONTEXT
 
     verbose = Option(
@@ -861,30 +916,33 @@ class Bench(Task):
 ###################
 # linters
 
-@task_params([{'name': 'output_file', 'long': 'output-file', 'default': None,
-               'help': 'Redirect report to a file'}])
-def task_flake8(output_file):
-    """Run flake8 over the code base and benchmarks."""
-    opts = ''
-    if output_file:
-        opts += f'--output-file={output_file}'
-    return {
-        'actions': [f"flake8 {opts} scipy benchmarks/benchmarks"],
-        'doc': 'Lint scipy and benchmarks directory',
-    }
+def emit_cmdstr(cmd):
+    """Print the command that's being run to stdout
+
+    Note: cannot use this in the below tasks (yet), because as is these command
+    strings are always echoed to the console, even if the command isn't run
+    (but for example the `build` command is run).
+    """
+    console = Console(theme=console_theme)
+    # The [cmd] square brackets controls the font styling, typically in italics
+    # to differentiate it from other stdout content
+    console.print(f"{EMOJI.cmd} [cmd] {cmd}")
 
 
-def task_pep8diff():
+def task_lint():
     # Lint just the diff since branching off of main using a
     # stricter configuration.
+    # emit_cmdstr(os.path.join('tools', 'lint.py') + ' --diff-against main')
     return {
-        'basename': 'pep8-diff',
-        'actions': [str(Dirs().root / 'tools' / 'lint_diff.py')],
+        'basename': 'lint',
+        'actions': [str(Dirs().root / 'tools' / 'lint.py') +
+                    ' --diff-against=main'],
         'doc': 'Lint only files modified since last commit (stricter rules)',
     }
 
 
 def task_unicode_check():
+    # emit_cmdstr(os.path.join('tools', 'unicode-check.py'))
     return {
         'basename': 'unicode-check',
         'actions': [str(Dirs().root / 'tools' / 'unicode-check.py')],
@@ -893,16 +951,25 @@ def task_unicode_check():
     }
 
 
+def task_check_test_name():
+    # emit_cmdstr(os.path.join('tools', 'check_test_name.py'))
+    return {
+        "basename": "check-testname",
+        "actions": [str(Dirs().root / "tools" / "check_test_name.py")],
+        "doc": "Check tests are correctly named so that pytest runs them."
+    }
+
+
 @cli.cls_cmd('lint')
 class Lint():
-    """:dash: Run flake8, check PEP 8 compliance on branch diff and check for
-    disallowed Unicode characters."""
-    output_file = Option(
-        ['--output-file'], default=None, help='Redirect report to a file')
-
-    def run(output_file):
-        opts = {'output_file': output_file}
-        run_doit_task({'flake8': opts, 'pep8-diff': {}, 'unicode-check': {}})
+    """:dash: Run linter on modified files and check for
+    disallowed Unicode characters and possibly-invalid test names."""
+    def run():
+        run_doit_task({
+            'lint': {},
+            'unicode-check': {},
+            'check-testname': {},
+        })
 
 
 @cli.cls_cmd('mypy')
@@ -938,6 +1005,7 @@ class Mypy(Task):
             os.environ['MYPY_FORCE_COLOR'] = '1'
             # Change to the site directory to make sure mypy doesn't pick
             # up any type stubs in the source tree.
+            emit_cmdstr(f"mypy.api.run --config-file {config} {check_path}")
             report, errors, status = mypy.api.run([
                 "--config-file",
                 str(config),
@@ -969,9 +1037,15 @@ TARGETS: Sphinx build targets [default: 'html']
         ['--parallel', '-j'], default=1, metavar='N_JOBS',
         help="Number of parallel jobs"
     )
+    no_cache = Option(
+        ['--no-cache'], default=False, is_flag=True,
+        help="Forces a full rebuild of the docs. Note that this may be " + \
+             "needed in order to make docstring changes in C/Cython files " + \
+             "show up."
+    )
 
     @classmethod
-    def task_meta(cls, list_targets, parallel, args, **kwargs):
+    def task_meta(cls, list_targets, parallel, no_cache, args, **kwargs):
         if list_targets:  # list MAKE targets, remove default target
             task_dep = []
             targets = ''
@@ -985,8 +1059,18 @@ TARGETS: Sphinx build targets [default: 'html']
         dirs = Dirs(build_args)
 
         make_params = [f'PYTHON="{sys.executable}"']
-        if parallel:
-            make_params.append(f'SPHINXOPTS="-j{parallel}"')
+        if parallel or no_cache:
+            sphinxopts = ""
+            if parallel:
+                sphinxopts += f"-j{parallel} "
+            if no_cache:
+                sphinxopts += "-E"
+            make_params.append(f'SPHINXOPTS="{sphinxopts}"')
+
+        # Environment variables needed for notebooks
+        # See gh-17322
+        make_params.append('SQLALCHEMY_SILENCE_UBER_WARNING=1')
+        make_params.append('JUPYTER_PLATFORM_DIRS=1')
 
         return {
             'actions': [
@@ -1061,7 +1145,7 @@ class Python():
             # Don't use subprocess, since we don't want to include the
             # current path in PYTHONPATH.
             sys.argv = extra_argv
-            with open(extra_argv[0], 'r') as f:
+            with open(extra_argv[0]) as f:
                 script = f.read()
             sys.modules['__main__'] = new_module('__main__')
             ns = dict(__name__='__main__', __file__=extra_argv[0])
@@ -1149,6 +1233,225 @@ def authors(ctx_obj, revision_args):
         subprocess.run([cmd], check=True, shell=True)
     except subprocess.CalledProcessError:
         print('Error caught: Incorrect revision start or revision end')
+
+
+# The following CPU core count functions were taken from loky/backend/context.py
+# See https://github.com/joblib/loky
+
+# Cache for the number of physical cores to avoid repeating subprocess calls.
+# It should not change during the lifetime of the program.
+physical_cores_cache = None
+
+
+def cpu_count(only_physical_cores=False):
+    """Return the number of CPUs the current process can use.
+
+    The returned number of CPUs accounts for:
+     * the number of CPUs in the system, as given by
+       ``multiprocessing.cpu_count``;
+     * the CPU affinity settings of the current process
+       (available on some Unix systems);
+     * Cgroup CPU bandwidth limit (available on Linux only, typically
+       set by docker and similar container orchestration systems);
+     * the value of the LOKY_MAX_CPU_COUNT environment variable if defined.
+    and is given as the minimum of these constraints.
+
+    If ``only_physical_cores`` is True, return the number of physical cores
+    instead of the number of logical cores (hyperthreading / SMT). Note that
+    this option is not enforced if the number of usable cores is controlled in
+    any other way such as: process affinity, Cgroup restricted CPU bandwidth
+    or the LOKY_MAX_CPU_COUNT environment variable. If the number of physical
+    cores is not found, return the number of logical cores.
+
+    Note that on Windows, the returned number of CPUs cannot exceed 61 (or 60 for
+    Python < 3.10), see:
+    https://bugs.python.org/issue26903.
+
+    It is also always larger or equal to 1.
+    """
+    # Note: os.cpu_count() is allowed to return None in its docstring
+    os_cpu_count = os.cpu_count() or 1
+    if sys.platform == "win32":
+        # On Windows, attempting to use more than 61 CPUs would result in a
+        # OS-level error. See https://bugs.python.org/issue26903. According to
+        # https://learn.microsoft.com/en-us/windows/win32/procthread/processor-groups
+        # it might be possible to go beyond with a lot of extra work but this
+        # does not look easy.
+        os_cpu_count = min(os_cpu_count, _MAX_WINDOWS_WORKERS)
+
+    cpu_count_user = _cpu_count_user(os_cpu_count)
+    aggregate_cpu_count = max(min(os_cpu_count, cpu_count_user), 1)
+
+    if not only_physical_cores:
+        return aggregate_cpu_count
+
+    if cpu_count_user < os_cpu_count:
+        # Respect user setting
+        return max(cpu_count_user, 1)
+
+    cpu_count_physical, exception = _count_physical_cores()
+    if cpu_count_physical != "not found":
+        return cpu_count_physical
+
+    # Fallback to default behavior
+    if exception is not None:
+        # warns only the first time
+        warnings.warn(
+            "Could not find the number of physical cores for the "
+            f"following reason:\n{exception}\n"
+            "Returning the number of logical cores instead. You can "
+            "silence this warning by setting LOKY_MAX_CPU_COUNT to "
+            "the number of cores you want to use."
+        )
+        traceback.print_tb(exception.__traceback__)
+
+    return aggregate_cpu_count
+
+
+def _cpu_count_cgroup(os_cpu_count):
+    # Cgroup CPU bandwidth limit available in Linux since 2.6 kernel
+    cpu_max_fname = "/sys/fs/cgroup/cpu.max"
+    cfs_quota_fname = "/sys/fs/cgroup/cpu/cpu.cfs_quota_us"
+    cfs_period_fname = "/sys/fs/cgroup/cpu/cpu.cfs_period_us"
+    if os.path.exists(cpu_max_fname):
+        # cgroup v2
+        # https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.html
+        with open(cpu_max_fname) as fh:
+            cpu_quota_us, cpu_period_us = fh.read().strip().split()
+    elif os.path.exists(cfs_quota_fname) and os.path.exists(cfs_period_fname):
+        # cgroup v1
+        # https://www.kernel.org/doc/html/latest/scheduler/sched-bwc.html#management
+        with open(cfs_quota_fname) as fh:
+            cpu_quota_us = fh.read().strip()
+        with open(cfs_period_fname) as fh:
+            cpu_period_us = fh.read().strip()
+    else:
+        # No Cgroup CPU bandwidth limit (e.g. non-Linux platform)
+        cpu_quota_us = "max"
+        cpu_period_us = 100_000  # unused, for consistency with default values
+
+    if cpu_quota_us == "max":
+        # No active Cgroup quota on a Cgroup-capable platform
+        return os_cpu_count
+    else:
+        cpu_quota_us = int(cpu_quota_us)
+        cpu_period_us = int(cpu_period_us)
+        if cpu_quota_us > 0 and cpu_period_us > 0:
+            return math.ceil(cpu_quota_us / cpu_period_us)
+        else:  # pragma: no cover
+            # Setting a negative cpu_quota_us value is a valid way to disable
+            # cgroup CPU bandwith limits
+            return os_cpu_count
+
+
+def _cpu_count_affinity(os_cpu_count):
+    # Number of available CPUs given affinity settings
+    if hasattr(os, "sched_getaffinity"):
+        try:
+            return len(os.sched_getaffinity(0))
+        except NotImplementedError:
+            pass
+
+    # On PyPy and possibly other platforms, os.sched_getaffinity does not exist
+    # or raises NotImplementedError, let's try with the psutil if installed.
+    try:
+        import psutil
+
+        p = psutil.Process()
+        if hasattr(p, "cpu_affinity"):
+            return len(p.cpu_affinity())
+
+    except ImportError:  # pragma: no cover
+        if (
+            sys.platform == "linux"
+            and os.environ.get("LOKY_MAX_CPU_COUNT") is None
+        ):
+            # PyPy does not implement os.sched_getaffinity on Linux which
+            # can cause severe oversubscription problems. Better warn the
+            # user in this particularly pathological case which can wreck
+            # havoc, typically on CI workers.
+            warnings.warn(
+                "Failed to inspect CPU affinity constraints on this system. "
+                "Please install psutil or explictly set LOKY_MAX_CPU_COUNT."
+            )
+
+    # This can happen for platforms that do not implement any kind of CPU
+    # infinity such as macOS-based platforms.
+    return os_cpu_count
+
+
+def _cpu_count_user(os_cpu_count):
+    """Number of user defined available CPUs"""
+    cpu_count_affinity = _cpu_count_affinity(os_cpu_count)
+
+    cpu_count_cgroup = _cpu_count_cgroup(os_cpu_count)
+
+    # User defined soft-limit passed as a loky specific environment variable.
+    cpu_count_loky = int(os.environ.get("LOKY_MAX_CPU_COUNT", os_cpu_count))
+
+    return min(cpu_count_affinity, cpu_count_cgroup, cpu_count_loky)
+
+
+def _count_physical_cores():
+    """Return a tuple (number of physical cores, exception)
+
+    If the number of physical cores is found, exception is set to None.
+    If it has not been found, return ("not found", exception).
+
+    The number of physical cores is cached to avoid repeating subprocess calls.
+    """
+    exception = None
+
+    # First check if the value is cached
+    global physical_cores_cache
+    if physical_cores_cache is not None:
+        return physical_cores_cache, exception
+
+    # Not cached yet, find it
+    try:
+        if sys.platform == "linux":
+            cpu_info = subprocess.run(
+                "lscpu --parse=core".split(), capture_output=True, text=True
+            )
+            cpu_info = cpu_info.stdout.splitlines()
+            cpu_info = {line for line in cpu_info if not line.startswith("#")}
+            cpu_count_physical = len(cpu_info)
+        elif sys.platform == "win32":
+            cpu_info = subprocess.run(
+                "wmic CPU Get NumberOfCores /Format:csv".split(),
+                capture_output=True,
+                text=True,
+            )
+            cpu_info = cpu_info.stdout.splitlines()
+            cpu_info = [
+                l.split(",")[1]
+                for l in cpu_info
+                if (l and l != "Node,NumberOfCores")
+            ]
+            cpu_count_physical = sum(map(int, cpu_info))
+        elif sys.platform == "darwin":
+            cpu_info = subprocess.run(
+                "sysctl -n hw.physicalcpu".split(),
+                capture_output=True,
+                text=True,
+            )
+            cpu_info = cpu_info.stdout
+            cpu_count_physical = int(cpu_info)
+        else:
+            raise NotImplementedError(f"unsupported platform: {sys.platform}")
+
+        # if cpu_count_physical < 1, we did not find a valid value
+        if cpu_count_physical < 1:
+            raise ValueError(f"found {cpu_count_physical} physical cores < 1")
+
+    except Exception as e:
+        exception = e
+        cpu_count_physical = "not found"
+
+    # Put the result in cache
+    physical_cores_cache = cpu_count_physical
+
+    return cpu_count_physical, exception
 
 
 if __name__ == '__main__':
