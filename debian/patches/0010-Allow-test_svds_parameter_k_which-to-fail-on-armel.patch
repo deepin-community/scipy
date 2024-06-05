@@ -6,15 +6,17 @@ Subject: Allow test_svds_parameter_k_which to fail on armel
  scipy/sparse/linalg/_eigen/tests/test_svds.py | 3 +++
  1 file changed, 3 insertions(+)
 
---- a/scipy/sparse/linalg/_eigen/tests/test_svds.py
-+++ b/scipy/sparse/linalg/_eigen/tests/test_svds.py
+Index: scipy/scipy/sparse/linalg/_eigen/tests/test_svds.py
+===================================================================
+--- scipy.orig/scipy/sparse/linalg/_eigen/tests/test_svds.py	2023-07-01 10:29:42.794737118 +0200
++++ scipy/scipy/sparse/linalg/_eigen/tests/test_svds.py	2023-07-01 10:29:42.786737042 +0200
 @@ -1,4 +1,5 @@
  import os
 +import platform
  import re
  import copy
  import numpy as np
-@@ -283,6 +284,8 @@ class SVDSCommonTests:
+@@ -279,6 +280,8 @@
          _check_svds(A, k, *res, which=which, atol=8e-10)
  
      # loop instead of parametrize for simplicity

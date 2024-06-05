@@ -30,20 +30,30 @@ export PYBUILD_BUILD_ARGS := -Csetup-args=-Dblas=blas -Csetup-args=-Dlapack=lapa
 # test_data (pooch) needs internet or cached data files
 SKIP_TEST_LIST += test_cont_basic[500-200-ncf-arg74] test_existence_all test_ascent test_face test_electrocardiogram
 
+# multi-Ellipsis indexing in sparse will be dropped in scipy 1.13
+# see https://github.com/scipy/scipy/pull/18541
+# it fails tests now so skip and reinstate later for scipy 1.13
+SKIP_TEST_LIST += test_multiple_ellipsis_slicing
+
 ifneq (,$(findstring $(DEB_HOST_ARCH), arm64))
     SKIP_TEST_LIST += test_maxiter_worsening[lgmres]
 endif
 
 # linalg/tests/test_decomp.py started segfaulting on armel
 ifneq (,$(findstring $(DEB_HOST_ARCH), armel))
-    SKIP_TEST_LIST += test_decomp test_random_exact test_brunnermunzel_normal_dist
+    SKIP_TEST_LIST += test_decomp test_random_exact test_brunnermunzel_normal_dist test_sparse_dense_divide
+    SKIP_TEST_LIST += test_some_code_paths test_gh12218
+endif
+
+ifneq (,$(findstring $(DEB_HOST_ARCH), armhf))
+    SKIP_TEST_LIST += test_gh12218
 endif
 
 # some tests broken on i386, see https://github.com/scipy/scipy/issues/17839
 ifneq (,$(findstring $(DEB_HOST_ARCH), i386))
     SKIP_TEST_LIST += test_find_peaks_exact test_find_peaks_withnoise test_x0_equals_Mb[bicgstab] test_rv_sample
-    SKIP_TEST_LIST += test_location_scale[pdf test_examples[True-float64] test_pdf_nolan_samples[pct_range0-alpha_range0-beta_range0]
-    SKIP_TEST_LIST += ellint_rg_xy0_ipp-ellint_rg_xy0
+    SKIP_TEST_LIST += test_location_scale[pdf test_examples[True-float64] test_pdf_nolan_samples test_cdf_nolan_samples
+    SKIP_TEST_LIST += ellint_rg_xy0_ipp-ellint_rg_xy0 test_hermitian
 endif
 
 # Bug#1017864 test_kolmogorov.py segfaults on i386 (including hurd)
@@ -57,6 +67,7 @@ endif
 # https://github.com/scipy/scipy/issues/17839#issuecomment-1400636840
 ifneq (,$(findstring $(DEB_HOST_ARCH), mips64el))
     SKIP_TEST_LIST += test_first_step test_classes test_integrality test_integrator test_double_integrator
+    SKIP_TEST_LIST += test_nanminmax
 endif
 
 ifneq (,$(findstring $(DEB_HOST_ARCH), mipsel))
@@ -65,37 +76,48 @@ endif
 
 # hppa runs out of memeory in test_bootstrap_against_theory
 ifneq (,$(findstring $(DEB_HOST_ARCH), hppa))
-    SKIP_TEST_LIST += test_nodata test_cont_basic[500-200-semicircular-arg89] test_bootstrap_against_theory
+    EXTRA_TEST_FLAGS += -v
+    SKIP_TEST_LIST += test_nodata test_cont_basic[500-200-semicircular-arg89] test_bootstrap_against_theory test_distance_transform_cdt05
+    SKIP_TEST_LIST += test_onenormest_linear_operator test_against_anderson_gumbel_r test_gh12218 test_bootstrap_against_R
+    SKIP_TEST_LIST += bootstrap_against_itself_1samp[basic-1780] test_bootstrap_against_itself_1samp[percentile-1784] test_bootstrap_against_itself_1samp[BCa-1784]
 endif
 
 # powerpc: failures in stats/tests/test_stats.py: overflow encountered in _hypergeom_*
 ifneq (,$(findstring $(DEB_HOST_ARCH), powerpc))
-    SKIP_TEST_LIST += test_hypergeom_cdf test_hypergeom_sf test_nch_hypergeom test_precision test_precise test_less_greater test_maxiter_worsening[lgmres]
+    SKIP_TEST_LIST += test_hypergeom_cdf test_hypergeom_sf test_nch_hypergeom test_precision test_precise
+    SKIP_TEST_LIST += test_less_greater test_maxiter_worsening[lgmres] test_distance_transform_cdt05
 endif
 
 # test_atol[bicg] only just misses tolerance on s390x, but the design of the test makes it difficult to workaround,
 # so skip. See https://github.com/scipy/scipy/issues/17839#issuecomment-1399477182
 ifneq (,$(findstring $(DEB_HOST_ARCH), s390x))
-    SKIP_TEST_LIST += test_maxiter_worsening test_atol[bicg]
+    SKIP_TEST_LIST += test_maxiter_worsening test_atol[bicg] test_distance_transform_cdt05
 endif
 
 ifneq (,$(findstring $(DEB_HOST_ARCH), hurd-i386))
+    EXTRA_TEST_FLAGS += -v
     SKIP_TEST_LIST += test_mip1 test_find_peaks_exact test_find_peaks_withnoise test_examples[True-float64] test_rv_sample test_location_scale[pdf
     SKIP_TEST_LIST += test_pdf_nolan_samples[pct_range0-alpha_range0-beta_range0] ellint_rg_xy0_ipp-ellint_rg_xy0
+    SKIP_TEST_LIST += test_logpdf_pdf_consistency test_gh12218 test_ttest_many_dims
 endif
 
 ifneq (,$(findstring $(DEB_HOST_ARCH), ia64))
-    SKIP_TEST_LIST += test_maxiter_worsening[lgmres]
+    EXTRA_TEST_FLAGS += -v
+    SKIP_TEST_LIST += test_maxiter_worsening[lgmres] test_examples[True-complex64]
 endif
 
 # https://github.com/scipy/scipy/issues/17839#issuecomment-1399478853
 ifneq (,$(findstring $(DEB_HOST_ARCH), ppc64))
-    SKIP_TEST_LIST += test_precond_dummy test_maxiter_worsening[lgmres]
+    SKIP_TEST_LIST += test_precond_dummy test_maxiter_worsening[lgmres] test_distance_transform_cdt05
 endif
 
 # https://github.com/scipy/scipy/issues/17839#issuecomment-1401780853
 ifneq (,$(findstring $(DEB_HOST_ARCH), riscv64))
-    SKIP_TEST_LIST += test_maxiter_worsening[lgmres]
+    SKIP_TEST_LIST += test_maxiter_worsening[lgmres] test_milp_timeout_16545
+endif
+
+ifneq (,$(findstring $(DEB_HOST_ARCH), sparc64))
+    SKIP_TEST_LIST += test_distance_transform_cdt05 test_milp_timeout_16545
 endif
 
 ifneq (,$(findstring $(DEB_HOST_ARCH), x32))
@@ -118,8 +140,7 @@ execute_after_dh_auto_clean:
 execute_before_dh_clean:
 	# make sure symlinks to submodules are cleaned up or empty directories from tarball are removed
 	rm -rf doc/source/_static/scipy-mathjax
-	rm -f doc/source/fontlist*.json
-	rm -rf scipy/_lib/boost
+	rm -rf scipy/_lib/boost_math
 	rm -rf scipy/_lib/highs
 	rm -rf scipy/_lib/unuran
 	rm -rf scipy/sparse/linalg/_propack/PROPACK
@@ -127,7 +148,7 @@ execute_before_dh_clean:
 execute_before_dh_auto_configure:
 	echo "Symlink to submodules"
 	ln -sf ../../../submodules/doc/source/_static/scipy-mathjax		doc/source/_static/scipy-mathjax
-	ln -sf ../../submodules/scipy/_lib/boost				scipy/_lib/boost
+	ln -sf ../../submodules/scipy/_lib/boost_math				scipy/_lib/boost_math
 	ln -sf ../../submodules/scipy/_lib/highs				scipy/_lib/highs
 	ln -sf ../../submodules/scipy/_lib/unuran				scipy/_lib/unuran
 	ln -sf ../../../../submodules/scipy/sparse/linalg/_propack/PROPACK	scipy/sparse/linalg/_propack/PROPACK
@@ -161,8 +182,9 @@ execute_after_dh_auto_install:
 	echo "skipping tests: $${SKIP_TESTS}"; \
 	for py in $(PY3VERS); do \
 	  PYLIBPATH=`pybuild --print build_dir -p$$py | awk '{print $$3}'`; \
-	  PYTHONPATH=$$PYLIBPATH python$$py \
-	        $(CURDIR)/runtests.py -n -- -k "$${SKIP_TESTS}"; \
+	  (cd $$PYLIBPATH; \
+	  PYTHONPATH=$$PYLIBPATH:$$PYTHONPATH python$$py \
+	        -m pytest $(EXTRA_TEST_FLAGS) -k "$${SKIP_TESTS}"); \
 	done
 endif
 
@@ -171,8 +193,9 @@ execute_after_dh_install:
 
 
 # meson build is still work-in-progress, installs residual cython (pyx) files
-# See cython_special comments in scipy/special/meson.build
+# See cython_special and _ufuncs comments in scipy/special/meson.build
 # and https://github.com/scipy/scipy/issues/14890
-# In the meantime clean up python3.X (not python3) files left after dh_python3
+# In the meantime clean up python3.X (not python3) and pyx files left after dh_python3
 execute_after_dh_python3:
-	rm -rf debian/python3-scipy/usr/lib/python$(PY3_DEFAULT)
+	rm -rf debian/python3-scipy/usr/lib/python3.*
+	rm -rf debian/python3-scipy/usr/lib/python3/dist-packages/scipy/special/*.pyx

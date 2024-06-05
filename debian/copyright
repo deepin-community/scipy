@@ -242,8 +242,8 @@ Files: submodules/scipy/_lib/highs/*
 Copyright: 2021 ERGO-Code
 License: Expat
 
-Files: submodules/scipy/_lib/boost/*
-Copyright: 2008 John Maddock (boost/math)
+Files: submodules/scipy/_lib/boost_math/*
+Copyright: 2008 John Maddock
  and other contributors
 License: Boost-1.0
  Boost Software License - Version 1.0 - August 17th, 2003
