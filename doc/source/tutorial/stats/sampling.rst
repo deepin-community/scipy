@@ -64,7 +64,6 @@ Some methods to do that are:
 More details on these algorithms can be found in the `appendix of the UNU.RAN
 user manual <http://statmath.wu.ac.at/software/unuran/doc/unuran.html#RVG>`__.
 
-
 When generating random variates of a distribution, two factors are important
 to determine the speed of a generator: the setup step and the actual sampling.
 Depending on the situation, different generators can be optimal. For example,
@@ -94,6 +93,9 @@ where
 * dpdf: derivative of the pdf
 * cdf: cumulative distribution function
 
+To apply the numerical inversion method NumericalInversePolynomial to a large
+number of continuous distributions in SciPy with minimal effort, take a look
+at `scipy.stats.sampling.FastGeneratorInversion`.
 
 =====================================  ===============  ===============  ===========  ==============
 Methods for discrete distributions     Required Inputs  Optional Inputs  Setup Speed  Sampling Speed
@@ -122,8 +124,8 @@ possible to truncate the distributions using a ``domain`` parameter.  All
 generators need a stream of uniform random numbers that are transformed into
 random variates of the given distribution. This is done by passing a ``random_state``
 parameter with a NumPy BitGenerator as the uniform random number generator.
-``random_state`` can either be a integer, `np.random.Generator`,
-or `np.random.RandomState`.
+``random_state`` can either be a integer, `numpy.random.Generator`,
+or `numpy.random.RandomState`.
 
 .. warning:: Use of NumPy < 1.19.0 is discouraged as it doesn't have a fast
              Cython API for generating uniform random numbers and might be
@@ -145,7 +147,8 @@ An example of this interface is shown below:
     ...         return -x * exp(-0.5 * x*x)
     ... 
     >>> dist = StandardNormal()
-    >>> 
+    >>>
+    >>> import numpy as np
     >>> urng = np.random.default_rng()
     >>> rng = TransformedDensityRejection(dist, random_state=urng)
 
@@ -166,7 +169,9 @@ which requires a PDF and its derivative w.r.t. ``x`` (i.e. the variate).
           ``pdf`` and ``cdf``. In both cases, one can implement a
           custom distribution object that contains all the required
           methods and that is not vectorized as shown in the example
-          above.
+          above. If one wants to apply a numerical inversion method to
+          a distribution defined in SciPy, please also take a look at
+          `scipy.stats.sampling.FastGeneratorInversion`.
 
 In the above example, we have set up an object of the
 :class:`~TransformedDensityRejection` method to sample from a
@@ -222,7 +227,7 @@ by visualizing the histogram of the samples:
           stream of random numbers than the one produced by the equivalent
           distribution in :mod:`scipy.stats` for any seed. The implementation
           of `rvs` in `scipy.stats.rv_continuous` usually relies on the NumPy
-          module `np.random` for well-known distributions (e.g., for the normal
+          module `numpy.random` for well-known distributions (e.g., for the normal
           distribution, the beta distribution) and transformations of other
           distributions (e.g., normal inverse Gaussian `scipy.stats.norminvgauss` and the
           lognormal `scipy.stats.lognorm` distribution). If no specific method is implemented,
@@ -234,7 +239,8 @@ by visualizing the histogram of the samples:
           :class:`~TransformedDensityRejection` would not be the same even for
           the same ``random_state``:
 
-          >>> from scipy.stats.sampling import norm, TransformedDensityRejection
+          >>> from scipy.stats import norm
+          >>> from scipy.stats.sampling import TransformedDensityRejection
           >>> from copy import copy
           >>> dist = StandardNormal()
           >>> urng1 = np.random.default_rng()
@@ -243,13 +249,13 @@ by visualizing the histogram of the samples:
           >>> rng.rvs()
           -1.526829048388144
           >>> norm.rvs(random_state=urng1_copy)
-          1.3194816698862635
+          1.3194816698862635 # may vary
 
 We can pass a ``domain`` parameter to truncate the distribution:
 
     >>> rng = TransformedDensityRejection(dist, domain=(-1, 1), random_state=urng)
     >>> rng.rvs((5, 3))
-    array([[-0.99865691,  0.38104014,  0.31633526],
+    array([[-0.99865691,  0.38104014,  0.31633526],    # may vary
            [ 0.88433909, -0.45181849,  0.78574461],
            [ 0.3337244 ,  0.12924307,  0.40499404],
            [-0.51865761,  0.43252222, -0.6514866 ],

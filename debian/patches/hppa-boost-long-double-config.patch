@@ -1,8 +1,11 @@
-Index: scipy/submodules/scipy/_lib/boost_math/include/boost/math/tools/config.hpp
+From: Drew Parsons <dparsons@debian.org>
+Date: Mon, 10 Jan 2022 13:13:25 +0100
+Subject: hppa-boost-long-double-config
+
 ===================================================================
---- scipy.orig/submodules/scipy/_lib/boost_math/include/boost/math/tools/config.hpp	2023-07-01 10:03:36.454423237 +0200
-+++ scipy/submodules/scipy/_lib/boost_math/include/boost/math/tools/config.hpp	2023-07-01 10:18:33.932922123 +0200
-@@ -172,7 +172,8 @@
+--- scipy.orig/submodules/scipy/_lib/boost_math/include/boost/math/tools/config.hpp	2024-08-11 19:03:03.682745397 +0200
++++ scipy/submodules/scipy/_lib/boost_math/include/boost/math/tools/config.hpp	2024-08-11 19:03:03.674745307 +0200
+@@ -219,7 +219,8 @@
  #include <boost/math/tools/user.hpp>
  
  #if (defined(__NetBSD__) || defined(__EMSCRIPTEN__)\

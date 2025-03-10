@@ -1,8 +1,332 @@
-scipy (1.11.4-10deepin0) unstable; urgency=medium
+scipy (1.14.1-4) unstable; urgency=medium
 
-  * No source change upload against GCC 12.
+  * skip special and stats complex number tests that fail with numpy 2
+    on mips64el. See upstream Issue#21393. Closes: #1094477.
 
- -- Tianyu Chen <sweetyfish@deepin.org>  Fri, 20 Sep 2024 12:18:14 +0800
+ -- Drew Parsons <dparsons@debian.org>  Thu, 30 Jan 2025 22:50:41 +1100
+
+scipy (1.14.1-3) unstable; urgency=medium
+
+  [ Michael R. Crusoe ]
+  * Enable parallel building.
+
+  [ Drew Parsons ]
+  * hppa: skip test_QRVS_shape_consistency
+    [1-d_out1-size_in4-size_out4-qrng1-NumericalInversePolynomial]
+  * update debian patch manage_docs.patch to renable html_sidebars
+    provided by python3-pydata-sphinx-theme
+
+ -- Drew Parsons <dparsons@debian.org>  Mon, 02 Dec 2024 21:00:32 +0100
+
+scipy (1.14.1-2) unstable; urgency=medium
+
+  * add debian patches to manage multiple python versions
+    - special_libsf_error_SOABI.patch builds libsf_error.so
+      with the python platform compatibility tag ('SOABI') appended to
+      the library name. libsf_error uses Python.h and is therefore not
+      a pure standalone C library independent of python version.
+      Removes need for dh_python3 --no-ext-rename.
+    - scipy_config_SOABI.patch adds platform compatibility tag
+      ('SOABI') to __config__.py, which provides meson build
+      information about the scipy build
+  * debian patch scipy-ub-float-to-int.patch fixes undefined behaviour
+    (UB) handling in expm for riscv64. Thanks Aurelien Jarno.
+    Closes: #1086108.
+  * python3-scipy Recommends: python3-pooch. Used by the datasets
+    submodule. Closes: #1086956.
+
+ -- Drew Parsons <dparsons@debian.org>  Fri, 22 Nov 2024 00:37:01 +0100
+
+scipy (1.14.1-1exp1) experimental; urgency=medium
+
+  * New upstream release.
+    - applies debian patch
+      0013-MAINT-Unskip-scipy.misc.test.test_decorator-for-Pyth.patch
+
+ -- Drew Parsons <dparsons@debian.org>  Thu, 21 Nov 2024 15:09:56 +0100
+
+scipy (1.14.0-1exp5) experimental; urgency=medium
+
+  * mip64el: skip flakey TestExpmFrechet (linalg test_matfuncs.py)
+  * hppa: skip more test_QRVS_shape_consistency
+
+ -- Drew Parsons <dparsons@debian.org>  Mon, 26 Aug 2024 17:07:11 +0200
+
+scipy (1.14.0-1exp4) experimental; urgency=medium
+
+  * mips64el: skip failing variants of test_axis_nan_policy_axis_is_None
+    (stats test_axis_nan_policy.py)
+  * add hppa to the NEEDS_NUMPY2 list (skip test_cython)
+
+ -- Drew Parsons <dparsons@debian.org>  Mon, 26 Aug 2024 09:23:15 +0200
+
+scipy (1.14.0-1exp3) experimental; urgency=medium
+
+  * run dh_python3 with --no-ext-rename instead of manipulating
+    libsf_error_state.so manually. mesonpy already instructs cython to
+    build python extensions with arch labels, so don't need extension
+    renaming from dh_python3. See Bug#1079496.
+  * update test skips
+    - mips64el: skip test_random_matrices_and_powers
+    - x32: reenable TestKSTwoSamples.test_gh12218. The dot was not
+      recognised (must be test_gh12218 alone), but the test is
+      naturally skipped with scipy 1.14 anyway.
+    - add alpha to the test_cython (Numpy 2) skip list
+
+ -- Drew Parsons <dparsons@debian.org>  Sun, 25 Aug 2024 10:05:09 +0200
+
+scipy (1.14.0-1exp2) experimental; urgency=medium
+
+  * debian/rules: shift scipy/special/libsf_error_state.so to
+    libsf_error_state while running dh_python3. It is a "normal"
+    shared library not a python extension, but dh_python3 would rename
+    it as if it were a python extension, causing runtime failure
+    finding the library. dh_python3 -X does not exclude that (see
+    Bug#1079496). Closes: #1078540.
+  * mips64el powerpc ppc64: skip test_cython (special test_extending)
+    Needs complex type changes from numpy 2 to pass.
+    See https://github.com/scipy/scipy/issues/21393
+  * skip more failing tests
+    - mips64el: test_2x2_input (linalg test_matfuncs.py::TestExpM)
+    - hppa: more test_QRVS_shape_consistency variants
+    - x32: TestKSTwoSamples.test_gh12218 (gets MemoryError)
+
+ -- Drew Parsons <dparsons@debian.org>  Sat, 24 Aug 2024 02:16:41 +0200
+
+scipy (1.14.0-1exp1) experimental; urgency=medium
+
+  * New upstream release
+    - applies debian patch test_singular_tol_PR20914.patch
+    - special/cephes moved to special/special/cephes
+  * debian patch fix_scipydoc_directive_PR20976.patch applies upstream
+    PR#20976 to fix doc build (needs StringList not ViewList)
+  * update debian patch manage_docs.patch
+    (theme-switcher is not available)
+
+ -- Drew Parsons <dparsons@debian.org>  Mon, 12 Aug 2024 00:42:15 +0200
+
+scipy (1.13.1-6) unstable; urgency=medium
+
+  * Team upload.
+  * d/patches: update metadata.
+  * Cherry-pick patch from upstream to fix the build with Python 3.13.
+    Closes: #1081692
+
+ -- Michael R. Crusoe <crusoe@debian.org>  Fri, 15 Nov 2024 00:59:00 +0100
+
+scipy (1.13.1-5) unstable; urgency=medium
+
+  * skip more failing tests
+    - mips64el: test_2x2_input test_nx2x2_input
+      (from linalg test_matfuncs.py::TestExpM)
+    - hppa: more test_QRVS_shape_consistency variants
+    - x32: TestKSTwoSamples.test_gh12218 (gets MemoryError)
+
+ -- Drew Parsons <dparsons@debian.org>  Sat, 24 Aug 2024 10:24:03 +0200
+
+scipy (1.13.1-4) unstable; urgency=medium
+
+  * revert python3-scipy back to Multi-Arch: no.
+    The arch is recorded inside some installed (plain text) files
+    e.g. scipy-*.dist-info/WHEEL, scipy/__config__.py
+    Closes: #1078977.
+  * skip failing tests
+    - alpha: test_read_over64bit_integer_sparse
+    - hppa: test_svd_gesdd_nofegfault
+
+ -- Drew Parsons <dparsons@debian.org>  Thu, 22 Aug 2024 01:07:47 +0200
+
+scipy (1.13.1-3) unstable; urgency=medium
+
+  * alpha: skip test_read_over64bit_integer_dense
+  * hppa: skip next test_QRVS_shape_consistency (qrng2)
+  * drop mipsel, ia64 test skips. Architectures no longer supported.
+
+ -- Drew Parsons <dparsons@debian.org>  Sun, 11 Aug 2024 18:19:53 +0200
+
+scipy (1.13.1-2) unstable; urgency=medium
+
+  * hppa: skip another test_QRVS_shape_consistency test case
+    (stats test_sampling.py)
+
+ -- Drew Parsons <dparsons@debian.org>  Wed, 31 Jul 2024 18:43:22 +0200
+
+scipy (1.13.1-1exp15) experimental; urgency=medium
+
+  * debian patch quadpack_C_PR21201.patch applies upstream PR#21201 to
+    refactor quadpack in C instead of fortran. Closes: #1074318.
+
+ -- Drew Parsons <dparsons@debian.org>  Tue, 23 Jul 2024 15:31:31 +0200
+
+scipy (1.13.1-1exp14) experimental; urgency=medium
+
+  * riscv64 hppa sparc64: skip test_nan_inputs[airye] from special
+
+ -- Drew Parsons <dparsons@debian.org>  Tue, 09 Jul 2024 00:22:38 +0200
+
+scipy (1.13.1-1exp13) experimental; urgency=medium
+
+  * riscv64 hppa sparc64: skip tests in signal test_cont2discrete.py
+    and elsewhere:
+    test_random_matrices_and_powers test_2x2_input test_nx2x2_input
+    test_zoh test_foh test_transferfunction test_zerospolesgain
+    test_discrete_approx test_simo_tf test_multioutput
+    TestC2dLti TestC2dInvariants TestStep
+    test_second_order test_integrator test_double_integrator
+    test_jordan_block test_array_like test_operators test_expm
+
+ -- Drew Parsons <dparsons@debian.org>  Mon, 08 Jul 2024 10:24:38 +0200
+
+scipy (1.13.1-1exp12) experimental; urgency=medium
+
+  * riscv64 hppa sparc64: skip test_multioutput (signal cont2discrete)
+
+ -- Drew Parsons <dparsons@debian.org>  Sat, 06 Jul 2024 23:04:18 +0200
+
+scipy (1.13.1-1exp11) experimental; urgency=medium
+
+  * riscv64 hppa sparc64: skip test_simo_tf
+    (signal test_cont2discrete.py)
+
+ -- Drew Parsons <dparsons@debian.org>  Fri, 05 Jul 2024 00:07:28 +0200
+
+scipy (1.13.1-1exp10) experimental; urgency=medium
+
+  * riscv64 hppa sparc64: skip test_zerospolesgain test_discrete_approx
+    (from signal test_cont2discrete.py)
+
+ -- Drew Parsons <dparsons@debian.org>  Wed, 03 Jul 2024 18:42:09 +0200
+
+scipy (1.13.1-1exp9) experimental; urgency=medium
+
+  * riscv64 hppa sparc64: skip test_transferfunction
+
+ -- Drew Parsons <dparsons@debian.org>  Tue, 02 Jul 2024 09:58:12 +0200
+
+scipy (1.13.1-1exp8) experimental; urgency=medium
+
+  * make docs with HOME=/tmp (cf. matplotlib doc build) to avoid error:
+    '/sbuild-nonexistent' is not a writable location
+  * riscv64 hppa sparc64: skip test_foh
+
+ -- Drew Parsons <dparsons@debian.org>  Mon, 01 Jul 2024 11:07:05 +0200
+
+scipy (1.13.1-1exp7) experimental; urgency=medium
+
+  * riscv64 hppa sparc64: skip test_zoh (signal test)
+  * use intersphinx to link docs
+    - update debian patch manage_docs.patch
+    - drop debian patch 0018-Drop-intersphinx.patch
+    - Build-Depends-Indep: python-matplotlib-doc, python-numpy-doc,
+      python-statsmodels-doc <!nodoc>
+  * build docs using JUPYTER_PLATFORM_DIRS=1
+    (for jupyter_cache used by myst_nb)
+
+ -- Drew Parsons <dparsons@debian.org>  Wed, 19 Jun 2024 11:05:59 +0200
+
+scipy (1.13.1-1exp6) experimental; urgency=medium
+
+  * skip TestExp (linalg test_matfuncs.py) on riscv64 hppa sparc64
+
+ -- Drew Parsons <dparsons@debian.org>  Fri, 14 Jun 2024 17:11:04 +0200
+
+scipy (1.13.1-1exp5) experimental; urgency=medium
+
+  * add mips64el to the verbose test list
+  * skip failing tests
+    - riscv64 hppa sparc64: test_nx2x2_input
+      (from linalg test_matfuncs.py TestExpM)
+    - powerpc: test_svd_gesdd_nofegfault (linalg test_decomp.py)
+
+ -- Drew Parsons <dparsons@debian.org>  Wed, 12 Jun 2024 10:40:56 +0200
+
+scipy (1.13.1-1exp4) experimental; urgency=medium
+
+  * skip test_random_matrices_and_powers and test_2x2_input
+    on riscv64 hppa sparc64
+
+ -- Drew Parsons <dparsons@debian.org>  Sun, 09 Jun 2024 22:58:37 +0200
+
+scipy (1.13.1-1exp3) experimental; urgency=medium
+
+  * add mips64el to the TestLogM skip list
+  * riscv64 and sparc64 time out. Run verbose tests to see where they
+    got stuck.
+  * hppa: skip test_random_matrices_and_powers
+
+ -- Drew Parsons <dparsons@debian.org>  Fri, 07 Jun 2024 22:59:54 +0200
+
+scipy (1.13.1-1exp2) experimental; urgency=medium
+
+  * i386: skip test_svd_gesdd_nofegfault (MemoryError)
+  * skip linalg test_matfuncs.py::TestLogM on failing arches,
+    riscv64 hppa sparc64
+  * debian patch test_singular_tol_PR20914.patch applies upstream
+    PR#20914 to relax tolerance enabling linalg test_singular to pass
+    against generic (netlib) BLAS.
+
+ -- Drew Parsons <dparsons@debian.org>  Thu, 06 Jun 2024 22:28:40 +0200
+
+scipy (1.13.1-1exp1) experimental; urgency=medium
+
+  * New upstream release
+    - Build-Depends: python3-pybind11 (>= 2.12.0~)
+    - debian/copyright: drop pocketfft_hdronly.h
+  * drop deprecated debian patch docs_privacy.patch
+  * Build-Depends-Indep: python3-myst-nb for doc build
+    - stop skipping myst-nb in debian patch manage_docs.patch
+  * update debian patch manage_docs.patch
+    - skip the jupyterlite_sphinx extension (not yet available on
+      Debian)
+    - deactivate missing template resources "search-button-field",
+      "version-switcher", "generate_toctree_html".
+      They are not provided with the doc source hence build fails.
+
+ -- Drew Parsons <dparsons@debian.org>  Wed, 05 Jun 2024 19:13:55 +0200
+
+scipy (1.12.0-2) unstable; urgency=medium
+
+  * hppa: skip test_QRVS_shape_consistency[NumericalInversePolynomial]
+  * Standards-Version: 4.7.0
+
+ -- Drew Parsons <dparsons@debian.org>  Mon, 03 Jun 2024 18:05:55 +0200
+
+scipy (1.12.0-1exp3) experimental; urgency=medium
+
+  * skip tests with memory or other issues in 32-bit
+    - powerpc: test_against_anderson_gumbel_r test_gh12218
+    - armel: skip same stats tests as armhf
+  * run build tests verbose (-v) on all 32-bit arches
+
+ -- Drew Parsons <dparsons@debian.org>  Thu, 23 May 2024 10:17:16 +0200
+
+scipy (1.12.0-1exp2) experimental; urgency=medium
+
+  * on armhf, i386, hppa, powerpc, skip test_random_state
+    test_against_anderson_gumbel_r test_bootstrap_against_R
+    test_bootstrap_against_itself_1samp, etc
+    to avoid memory failure and random crashes
+  * use test verbose flag (-v) on armhf, powerpc
+    to identify crashing tests
+
+ -- Drew Parsons <dparsons@debian.org>  Thu, 23 May 2024 01:33:34 +0200
+
+scipy (1.12.0-1exp1) experimental; urgency=medium
+
+  * New upstream release
+    - update versioned Build-Depends:
+      cython3,
+      python3-mesonpy (>= 0.15.0~),
+      python3-doit (>= 0.36.0~),
+      python3-numpy (>= 1:1.26.0~),
+      python3-pythran (>= 0.15.0~)
+    - Depends: python3-hypothesis for tests
+  * remove redundant debian patch qhull-lfs.patch
+    (would need to add to meson.build if still relevant)
+  * link to all submodules in submodules/scipy/_lib
+  * add Drew Parsons to uploaders
+
+ -- Drew Parsons <dparsons@debian.org>  Tue, 14 May 2024 14:41:42 +0200
 
 scipy (1.11.4-10) unstable; urgency=medium
 

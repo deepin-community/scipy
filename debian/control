@@ -1,11 +1,12 @@
 Source: scipy
 Maintainer: Debian Python Team <team+python@tracker.debian.org>
-Uploaders: Ondrej Certik <ondrej@certik.cz>,
+Uploaders: Drew Parsons <dparsons@debian.org>,
+           Ondrej Certik <ondrej@certik.cz>,
            David Cournapeau <cournape@gmail.com>,
            Varun Hiremath <varun@debian.org>
 Section: python
 Priority: optional
-Build-Depends: cython3-legacy,
+Build-Depends: cython3,
                debhelper-compat (= 13),
                dh-sequence-python3,
                pybuild-plugin-pyproject,
@@ -14,33 +15,38 @@ Build-Depends: cython3-legacy,
                liblapack-dev,
                liblbfgsb-dev,
                libsuitesparse-dev,
-               python3-mesonpy (>= 0.12.1~),
+               python3-mesonpy (>= 0.15.0~),
                pkgconf,
                python3-all-dev,
                python3-decorator,
-               python3-doit (>= 0.35~) <!nocheck>,
-               python3-numpy (>= 1:1.21.6~),
+               python3-numpy (>= 1:1.26.0~),
                python3-pooch,
-               python3-pybind11 (>= 2.10.4~),
-               python3-pytest,
+               python3-pybind11 (>= 2.12.0~),
                python3-setuptools,
                python3-wheel,
-               python3-pythran (>= 0.12.0~)
+               python3-pythran (>= 0.15.0~),
+               python3-pytest,
+               python3-doit (>= 0.36.0~) <!nocheck>,
+               python3-hypothesis <!nocheck>
 Build-Depends-Indep: dvipng,
                      dh-sequence-sphinxdoc,
-                     python3-doc,
+                     python3-doc <!nodoc>,
                      python3-docutils,
                      python3-matplotlib,
-                     python3-numpydoc,
+                     python-matplotlib-doc <!nodoc>,
+                     python3-myst-nb <!nodoc>,
+                     python-numpy-doc <!nodoc>,
+                     python3-numpydoc <!nodoc>,
                      python3-pydata-sphinx-theme,
                      python3-sphinx,
                      python3-sphinx-design,
                      python3-sphinx-tabs,
+                     python-statsmodels-doc <!nodoc>,
                      rdfind,
                      symlinks,
                      texlive-latex-base,
                      texlive-latex-extra
-Standards-Version: 4.6.2
+Standards-Version: 4.7.0
 Vcs-Browser: https://salsa.debian.org/python-team/packages/scipy
 Vcs-Git: https://salsa.debian.org/python-team/packages/scipy.git
 Homepage: https://www.scipy.org/
@@ -48,14 +54,15 @@ Rules-Requires-Root: no
 
 Package: python3-scipy
 Architecture: any
-Multi-Arch: foreign
+Multi-Arch: no
 Depends: python3-decorator,
-         python3-numpy (>= 1:1.17.3~),
+         python3-numpy (>= 1:1.26.0~),
          ${misc:Depends},
          ${python3:Depends},
          ${shlibs:Depends}
 Recommends: g++ | c++-compiler,
-            python3-pil
+            python3-pil,
+            python3-pooch
 Suggests: python-scipy-doc
 Breaks: python3-skbio (<< 0.5.8-3~)
 Description: scientific tools for Python 3

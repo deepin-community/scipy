@@ -1,4 +1,3 @@
-import platform
 import itertools
 import warnings
 
@@ -13,14 +12,13 @@ from numpy.testing import (assert_equal, assert_almost_equal, assert_,
 import pytest
 from pytest import raises as assert_raises
 
-from scipy._lib import _pep440
 from scipy.linalg import (solve, inv, det, lstsq, pinv, pinvh, norm,
                           solve_banded, solveh_banded, solve_triangular,
                           solve_circulant, circulant, LinAlgError, block_diag,
                           matrix_balance, qr, LinAlgWarning)
 
 from scipy.linalg._testutils import assert_no_overwrite
-from scipy._lib._testutils import check_free_memory
+from scipy._lib._testutils import check_free_memory, IS_MUSL
 from scipy.linalg.blas import HAS_ILP64
 
 REAL_DTYPES = (np.float32, np.float64, np.longdouble)
@@ -175,6 +173,23 @@ class TestSolveBanded:
         b = [10.0, 0.0, 2.0, 14.0]
         x = solve_banded((l, u), ab, b)
         assert_array_almost_equal(dot(a, x), b)
+
+    @pytest.mark.parametrize('dt_ab', [int, float, np.float32, complex, np.complex64])
+    @pytest.mark.parametrize('dt_b', [int, float, np.float32, complex, np.complex64])
+    def test_empty(self, dt_ab, dt_b):
+        # ab contains one empty row corresponding to the diagonal
+        ab = np.array([[]], dtype=dt_ab)
+        b = np.array([], dtype=dt_b)
+        x = solve_banded((0, 0), ab, b)
+
+        assert x.shape == (0,)
+        assert x.dtype == solve(np.eye(1, dtype=dt_ab), np.ones(1, dtype=dt_b)).dtype
+
+        b = np.empty((0, 0), dtype=dt_b)
+        x = solve_banded((0, 0), ab, b)
+
+        assert x.shape == (0, 0)
+        assert x.dtype == solve(np.eye(1, dtype=dt_ab), np.ones(1, dtype=dt_b)).dtype
 
 
 class TestSolveHBanded:
@@ -491,6 +506,22 @@ class TestSolveHBanded:
         x = solveh_banded(ab, b)
         assert_array_almost_equal(x, [0.0, 1.0, 0.0, 0.0])
 
+    @pytest.mark.parametrize('dt_ab', [int, float, np.float32, complex, np.complex64])
+    @pytest.mark.parametrize('dt_b', [int, float, np.float32, complex, np.complex64])
+    def test_empty(self, dt_ab, dt_b):
+        # ab contains one empty row corresponding to the diagonal
+        ab = np.array([[]], dtype=dt_ab)
+        b = np.array([], dtype=dt_b)
+        x = solveh_banded(ab, b)
+
+        assert x.shape == (0,)
+        assert x.dtype == solve(np.eye(1, dtype=dt_ab), np.ones(1, dtype=dt_b)).dtype
+
+        b = np.empty((0, 0), dtype=dt_b)
+        x = solveh_banded(ab, b)
+
+        assert x.shape == (0, 0)
+        assert x.dtype == solve(np.eye(1, dtype=dt_ab), np.ones(1, dtype=dt_b)).dtype
 
 class TestSolve:
     def setup_method(self):
@@ -738,13 +769,6 @@ class TestSolve:
             warnings.simplefilter('error')
             assert_raises(LinAlgWarning, solve, a, b)
 
-    def test_empty_rhs(self):
-        a = np.eye(2)
-        b = [[], []]
-        x = solve(a, b)
-        assert_(x.size == 0, 'Returned array is not empty')
-        assert_(x.shape == (2, 0), 'Returned empty array shape is wrong')
-
     def test_multiple_rhs(self):
         a = np.eye(2)
         b = np.random.rand(2, 3, 4)
@@ -785,8 +809,8 @@ class TestSolve:
             if assume_a == 'her' and not is_complex:
                 continue
 
-            err_msg = ("Failed for size: {}, assume_a: {},"
-                       "dtype: {}".format(size, assume_a, dtype))
+            err_msg = (f"Failed for size: {size}, assume_a: {assume_a},"
+                       f"dtype: {dtype}")
 
             a = np.random.randn(size, size).astype(dtype)
             b = np.random.randn(size).astype(dtype)
@@ -821,6 +845,24 @@ class TestSolve:
                                 atol=tol * size,
                                 rtol=tol * size,
                                 err_msg=err_msg)
+
+    @pytest.mark.parametrize('dt_a', [int, float, np.float32, complex, np.complex64])
+    @pytest.mark.parametrize('dt_b', [int, float, np.float32, complex, np.complex64])
+    def test_empty(self, dt_a, dt_b):
+        a = np.empty((0, 0), dtype=dt_a)
+        b = np.empty(0, dtype=dt_b)
+        x = solve(a, b)
+
+        assert x.size == 0
+        dt_nonempty = solve(np.eye(2, dtype=dt_a), np.ones(2, dtype=dt_b)).dtype
+        assert x.dtype == dt_nonempty
+
+    def test_empty_rhs(self):
+        a = np.eye(2)
+        b = [[], []]
+        x = solve(a, b)
+        assert_(x.size == 0, 'Returned array is not empty')
+        assert_(x.shape == (2, 0), 'Returned empty array shape is wrong')
 
 
 class TestSolveTriangular:
@@ -884,6 +926,26 @@ class TestSolveTriangular:
         sol = solve_triangular(A, b, lower=True, check_finite=False)
         assert_array_almost_equal(sol, [1, 0])
 
+    @pytest.mark.parametrize('dt_a', [int, float, np.float32, complex, np.complex64])
+    @pytest.mark.parametrize('dt_b', [int, float, np.float32, complex, np.complex64])
+    def test_empty(self, dt_a, dt_b):
+        a = np.empty((0, 0), dtype=dt_a)
+        b = np.empty(0, dtype=dt_b)
+        x = solve_triangular(a, b)
+
+        assert x.size == 0
+        dt_nonempty = solve_triangular(
+            np.eye(2, dtype=dt_a), np.ones(2, dtype=dt_b)
+        ).dtype
+        assert x.dtype == dt_nonempty
+
+    def test_empty_rhs(self):
+        a = np.eye(2)
+        b = [[], []]
+        x = solve_triangular(a, b)
+        assert_(x.size == 0, 'Returned array is not empty')
+        assert_(x.shape == (2, 0), 'Returned empty array shape is wrong')
+
 
 class TestInv:
     def setup_method(self):
@@ -926,6 +988,13 @@ class TestInv:
         a = [[1, 2], [3, 4]]
         a_inv = inv(a, check_finite=False)
         assert_array_almost_equal(dot(a, a_inv), [[1, 0], [0, 1]])
+
+    @pytest.mark.parametrize('dt', [int, float, np.float32, complex, np.complex64])
+    def test_empty(self, dt):
+        a = np.empty((0, 0), dtype=dt)
+        a_inv = inv(a)
+        assert a_inv.size == 0
+        assert a_inv.dtype == inv(np.eye(2, dtype=dt)).dtype
 
 
 class TestDet:
@@ -1044,6 +1113,18 @@ class TestDet:
         with assert_raises(ValueError, match='Last 2 dimensions'):
             det(np.array([[[]]]))
 
+    @pytest.mark.parametrize('dt', [int, float, np.float32, complex, np.complex64])
+    def test_empty_dtype(self, dt):
+        a = np.empty((0, 0), dtype=dt)
+        d = det(a)
+        assert d.shape == ()
+        assert d.dtype == det(np.eye(2, dtype=dt)).dtype
+
+        a = np.empty((3, 0, 0), dtype=dt)
+        d = det(a)
+        assert d.shape == (3,)
+        assert d.dtype == det(np.empty((3, 1, 1), dtype=dt)).dtype
+
     def test_overwrite_a(self):
         # If all conditions are met then input should be overwritten;
         #   - dtype is one of 'fdFD'
@@ -1077,11 +1158,7 @@ def direct_lstsq(a, b, cmplx=0):
 
 
 class TestLstsq:
-
     lapack_drivers = ('gelsd', 'gelss', 'gelsy', None)
-
-    def setup_method(self):
-        np.random.seed(1234)
 
     def test_simple_exact(self):
         for dtype in REAL_DTYPES:
@@ -1192,89 +1269,90 @@ class TestLstsq:
                                     atol=25 * _eps_cast(a1.dtype),
                                     err_msg="driver: %s" % lapack_driver)
 
-    def test_random_exact(self):
-        for dtype in REAL_DTYPES:
-            for n in (20, 200):
-                for lapack_driver in TestLstsq.lapack_drivers:
-                    for overwrite in (True, False):
-                        a = np.asarray(random([n, n]), dtype=dtype)
-                        for i in range(n):
-                            a[i, i] = 20 * (0.1 + a[i, i])
-                        for i in range(4):
-                            b = np.asarray(random([n, 3]), dtype=dtype)
-                            # Store values in case they are overwritten later
-                            a1 = a.copy()
-                            b1 = b.copy()
-                            out = lstsq(a1, b1,
-                                        lapack_driver=lapack_driver,
-                                        overwrite_a=overwrite,
-                                        overwrite_b=overwrite)
-                            x = out[0]
-                            r = out[2]
-                            assert_(r == n, 'expected efficient rank {}, '
-                                    'got {}'.format(n, r))
-                            if dtype is np.float32:
-                                assert_allclose(
-                                          dot(a, x), b,
-                                          rtol=500 * _eps_cast(a1.dtype),
-                                          atol=500 * _eps_cast(a1.dtype),
-                                          err_msg="driver: %s" % lapack_driver)
-                            else:
-                                assert_allclose(
-                                          dot(a, x), b,
-                                          rtol=1000 * _eps_cast(a1.dtype),
-                                          atol=1000 * _eps_cast(a1.dtype),
-                                          err_msg="driver: %s" % lapack_driver)
+    @pytest.mark.parametrize("dtype", REAL_DTYPES)
+    @pytest.mark.parametrize("n", (20, 200))
+    @pytest.mark.parametrize("lapack_driver", lapack_drivers)
+    @pytest.mark.parametrize("overwrite", (True, False))
+    def test_random_exact(self, dtype, n, lapack_driver, overwrite):
+        rng = np.random.RandomState(1234)
 
-    def test_random_complex_exact(self):
-        if platform.system() != "Windows":
-            if _pep440.parse(np.__version__) >= _pep440.Version("1.24.0"):
-                libc_flavor = platform.libc_ver()[0]
-                if libc_flavor != "glibc":
-                    pytest.skip("segfault observed on alpine per gh-17630")
-        for dtype in COMPLEX_DTYPES:
-            for n in (20, 200):
-                for lapack_driver in TestLstsq.lapack_drivers:
-                    for overwrite in (True, False):
-                        a = np.asarray(random([n, n]) + 1j*random([n, n]),
-                                       dtype=dtype)
-                        for i in range(n):
-                            a[i, i] = 20 * (0.1 + a[i, i])
-                        for i in range(2):
-                            b = np.asarray(random([n, 3]), dtype=dtype)
-                            # Store values in case they are overwritten later
-                            a1 = a.copy()
-                            b1 = b.copy()
-                            out = lstsq(a1, b1, lapack_driver=lapack_driver,
-                                        overwrite_a=overwrite,
-                                        overwrite_b=overwrite)
-                            x = out[0]
-                            r = out[2]
-                            assert_(r == n, 'expected efficient rank {}, '
-                                    'got {}'.format(n, r))
-                            if dtype is np.complex64:
-                                assert_allclose(
-                                          dot(a, x), b,
-                                          rtol=400 * _eps_cast(a1.dtype),
-                                          atol=400 * _eps_cast(a1.dtype),
-                                          err_msg="driver: %s" % lapack_driver)
-                            else:
-                                assert_allclose(
-                                          dot(a, x), b,
-                                          rtol=1000 * _eps_cast(a1.dtype),
-                                          atol=1000 * _eps_cast(a1.dtype),
-                                          err_msg="driver: %s" % lapack_driver)
+        a = np.asarray(rng.random([n, n]), dtype=dtype)
+        for i in range(n):
+            a[i, i] = 20 * (0.1 + a[i, i])
+        for i in range(4):
+            b = np.asarray(rng.random([n, 3]), dtype=dtype)
+            # Store values in case they are overwritten later
+            a1 = a.copy()
+            b1 = b.copy()
+            out = lstsq(a1, b1,
+                        lapack_driver=lapack_driver,
+                        overwrite_a=overwrite,
+                        overwrite_b=overwrite)
+            x = out[0]
+            r = out[2]
+            assert_(r == n, f'expected efficient rank {n}, '
+                    f'got {r}')
+            if dtype is np.float32:
+                assert_allclose(
+                          dot(a, x), b,
+                          rtol=500 * _eps_cast(a1.dtype),
+                          atol=500 * _eps_cast(a1.dtype),
+                          err_msg="driver: %s" % lapack_driver)
+            else:
+                assert_allclose(
+                          dot(a, x), b,
+                          rtol=1000 * _eps_cast(a1.dtype),
+                          atol=1000 * _eps_cast(a1.dtype),
+                          err_msg="driver: %s" % lapack_driver)
+
+    @pytest.mark.skipif(IS_MUSL, reason="may segfault on Alpine, see gh-17630")
+    @pytest.mark.parametrize("dtype", COMPLEX_DTYPES)
+    @pytest.mark.parametrize("n", (20, 200))
+    @pytest.mark.parametrize("lapack_driver", lapack_drivers)
+    @pytest.mark.parametrize("overwrite", (True, False))
+    def test_random_complex_exact(self, dtype, n, lapack_driver, overwrite):
+        rng = np.random.RandomState(1234)
+
+        a = np.asarray(rng.random([n, n]) + 1j*rng.random([n, n]),
+                       dtype=dtype)
+        for i in range(n):
+            a[i, i] = 20 * (0.1 + a[i, i])
+        for i in range(2):
+            b = np.asarray(rng.random([n, 3]), dtype=dtype)
+            # Store values in case they are overwritten later
+            a1 = a.copy()
+            b1 = b.copy()
+            out = lstsq(a1, b1, lapack_driver=lapack_driver,
+                        overwrite_a=overwrite,
+                        overwrite_b=overwrite)
+            x = out[0]
+            r = out[2]
+            assert_(r == n, f'expected efficient rank {n}, '
+                    f'got {r}')
+            if dtype is np.complex64:
+                assert_allclose(
+                          dot(a, x), b,
+                          rtol=400 * _eps_cast(a1.dtype),
+                          atol=400 * _eps_cast(a1.dtype),
+                          err_msg="driver: %s" % lapack_driver)
+            else:
+                assert_allclose(
+                          dot(a, x), b,
+                          rtol=1000 * _eps_cast(a1.dtype),
+                          atol=1000 * _eps_cast(a1.dtype),
+                          err_msg="driver: %s" % lapack_driver)
 
     def test_random_overdet(self):
+        rng = np.random.RandomState(1234)
         for dtype in REAL_DTYPES:
             for (n, m) in ((20, 15), (200, 2)):
                 for lapack_driver in TestLstsq.lapack_drivers:
                     for overwrite in (True, False):
-                        a = np.asarray(random([n, m]), dtype=dtype)
+                        a = np.asarray(rng.random([n, m]), dtype=dtype)
                         for i in range(m):
                             a[i, i] = 20 * (0.1 + a[i, i])
                         for i in range(4):
-                            b = np.asarray(random([n, 3]), dtype=dtype)
+                            b = np.asarray(rng.random([n, 3]), dtype=dtype)
                             # Store values in case they are overwritten later
                             a1 = a.copy()
                             b1 = b.copy()
@@ -1284,8 +1362,8 @@ class TestLstsq:
                                         overwrite_b=overwrite)
                             x = out[0]
                             r = out[2]
-                            assert_(r == m, 'expected efficient rank {}, '
-                                    'got {}'.format(m, r))
+                            assert_(r == m, f'expected efficient rank {m}, '
+                                    f'got {r}')
                             assert_allclose(
                                           x, direct_lstsq(a, b, cmplx=0),
                                           rtol=25 * _eps_cast(a1.dtype),
@@ -1293,16 +1371,17 @@ class TestLstsq:
                                           err_msg="driver: %s" % lapack_driver)
 
     def test_random_complex_overdet(self):
+        rng = np.random.RandomState(1234)
         for dtype in COMPLEX_DTYPES:
             for (n, m) in ((20, 15), (200, 2)):
                 for lapack_driver in TestLstsq.lapack_drivers:
                     for overwrite in (True, False):
-                        a = np.asarray(random([n, m]) + 1j*random([n, m]),
+                        a = np.asarray(rng.random([n, m]) + 1j*rng.random([n, m]),
                                        dtype=dtype)
                         for i in range(m):
                             a[i, i] = 20 * (0.1 + a[i, i])
                         for i in range(2):
-                            b = np.asarray(random([n, 3]), dtype=dtype)
+                            b = np.asarray(rng.random([n, 3]), dtype=dtype)
                             # Store values in case they are overwritten
                             # later
                             a1 = a.copy()
@@ -1313,8 +1392,8 @@ class TestLstsq:
                                         overwrite_b=overwrite)
                             x = out[0]
                             r = out[2]
-                            assert_(r == m, 'expected efficient rank {}, '
-                                    'got {}'.format(m, r))
+                            assert_(r == m, f'expected efficient rank {m}, '
+                                    f'got {r}')
                             assert_allclose(
                                       x, direct_lstsq(a, b, cmplx=1),
                                       rtol=25 * _eps_cast(a1.dtype),
@@ -1353,7 +1432,7 @@ class TestLstsq:
                             atol=25 * _eps_cast(a.dtype),
                             err_msg="driver: %s" % lapack_driver)
 
-    def test_zero_size(self):
+    def test_empty(self):
         for a_shape, b_shape in (((0, 2), (0,)),
                                  ((0, 4), (0, 2)),
                                  ((4, 0), (4,)),
@@ -1367,6 +1446,16 @@ class TestLstsq:
             assert_(rank == 0, 'expected rank 0')
             assert_equal(s, np.empty((0,)))
 
+    @pytest.mark.parametrize('dt_a', [int, float, np.float32, complex, np.complex64])
+    @pytest.mark.parametrize('dt_b', [int, float, np.float32, complex, np.complex64])
+    def test_empty_dtype(self, dt_a, dt_b):
+        a = np.empty((0, 0), dtype=dt_a)
+        b = np.empty(0, dtype=dt_b)
+        x, residues, rank, s = lstsq(a, b)
+
+        assert x.size == 0
+        dt_nonempty = lstsq(np.eye(2, dtype=dt_a), np.ones(2, dtype=dt_b))[0].dtype
+        assert x.dtype == dt_nonempty
 
 class TestPinv:
     def setup_method(self):
@@ -1447,6 +1536,13 @@ class TestPinv:
         assert_allclose(np.linalg.norm(adiff1), 4.233, rtol=0.01)
         assert_allclose(np.linalg.norm(adiff2), 4.233, rtol=0.01)
 
+    @pytest.mark.parametrize('dt', [float, np.float32, complex, np.complex64])
+    def test_empty(self, dt):
+        a = np.empty((0, 0), dtype=dt)
+        a_pinv = pinv(a)
+        assert a_pinv.size == 0
+        assert a_pinv.dtype == pinv(np.eye(2, dtype=dt)).dtype
+
 
 class TestPinvSymmetric:
 
@@ -1483,6 +1579,14 @@ class TestPinvSymmetric:
         a_pinv = pinvh(a.tolist())
         assert_array_almost_equal(np.dot(a, a_pinv), np.eye(3))
 
+    def test_zero_eigenvalue(self):
+        # https://github.com/scipy/scipy/issues/12515
+        # the SYEVR eigh driver may give the zero eigenvalue > eps
+        a = np.array([[1,-1, 0], [-1, 2, -1], [0, -1, 1]])
+        p = pinvh(a)
+        assert_allclose(p @ a @ p, p, atol=1e-15)
+        assert_allclose(a @ p @ a, a, atol=1e-15)
+
     def test_atol_rtol(self):
         n = 12
         # get a random ortho matrix for shuffling
@@ -1509,6 +1613,13 @@ class TestPinvSymmetric:
         # adiff1 and adiff2 should be elevated to ~1e-4 due to mismatch
         assert_allclose(norm(adiff1), 1e-4, rtol=0.1)
         assert_allclose(norm(adiff2), 1e-4, rtol=0.1)
+
+    @pytest.mark.parametrize('dt', [float, np.float32, complex, np.complex64])
+    def test_empty(self, dt):
+        a = np.empty((0, 0), dtype=dt)
+        a_pinv = pinvh(a)
+        assert a_pinv.size == 0
+        assert a_pinv.dtype == pinv(np.eye(2, dtype=dt)).dtype
 
 
 @pytest.mark.parametrize('scale', (1e-20, 1., 1e20))
@@ -1586,13 +1697,13 @@ class TestMatrixNorms:
         # Not all of these are matrix norms in the most technical sense.
         np.random.seed(1234)
         for n, m in (1, 1), (1, 3), (3, 1), (4, 4), (4, 5), (5, 4):
-            for t in np.single, np.double, np.csingle, np.cdouble, np.int64:
+            for t in np.float32, np.float64, np.complex64, np.complex128, np.int64:
                 A = 10 * np.random.randn(n, m).astype(t)
                 if np.issubdtype(A.dtype, np.complexfloating):
                     A = (A + 10j * np.random.randn(n, m)).astype(t)
-                    t_high = np.cdouble
+                    t_high = np.complex128
                 else:
-                    t_high = np.double
+                    t_high = np.float64
                 for order in (None, 'fro', 1, -1, 2, -2, np.inf, -np.inf):
                     actual = norm(A, ord=order)
                     desired = np.linalg.norm(A, ord=order)
@@ -1625,6 +1736,17 @@ class TestMatrixNorms:
         c = norm(a, ord=1, axis=(0, 1), keepdims=True)
         assert_allclose(b, c)
         assert_(b.shape == c.shape)
+
+    def test_empty(self):
+        a = np.empty((0, 0))
+        assert_allclose(norm(a), 0.)
+        assert_allclose(norm(a, axis=0), np.zeros((0,)))
+        assert_allclose(norm(a, keepdims=True), np.zeros((1, 1)))
+
+        a = np.empty((0, 3))
+        assert_allclose(norm(a), 0.)
+        assert_allclose(norm(a, axis=0), np.zeros((3,)))
+        assert_allclose(norm(a, keepdims=True), np.zeros((1, 1)))
 
 
 class TestOverwrite:
@@ -1741,6 +1863,21 @@ class TestSolveCirculant:
         y = solve(circulant(c), b)
         assert_allclose(x, y)
 
+    @pytest.mark.parametrize('dt_c', [int, float, np.float32, complex, np.complex64])
+    @pytest.mark.parametrize('dt_b', [int, float, np.float32, complex, np.complex64])
+    def test_empty(self, dt_c, dt_b):
+        c = np.array([], dtype=dt_c)
+        b = np.array([], dtype=dt_b)
+        x = solve_circulant(c, b)
+        assert x.shape == (0,)
+        assert x.dtype == solve_circulant(np.arange(3, dtype=dt_c),
+                                          np.ones(3, dtype=dt_b)).dtype
+
+        b = np.empty((0, 0), dtype=dt_b)
+        x1 = solve_circulant(c, b)
+        assert x1.shape == (0, 0)
+        assert x1.dtype == x.dtype
+
 
 class TestMatrix_Balance:
 
@@ -1805,3 +1942,27 @@ class TestMatrix_Balance:
             ip[p] = np.arange(A.shape[0])
             assert_allclose(y, np.diag(s)[ip, :])
             assert_allclose(solve(y, A).dot(y), x)
+
+    @pytest.mark.parametrize('dt', [int, float, np.float32, complex, np.complex64])
+    def test_empty(self, dt):
+        a = np.empty((0, 0), dtype=dt)
+        b, t = matrix_balance(a)
+
+        assert b.size == 0
+        assert t.size == 0
+
+        b_n, t_n = matrix_balance(np.eye(2, dtype=dt))
+        assert b.dtype == b_n.dtype
+        assert t.dtype == t_n.dtype
+
+
+        b, (scale, perm) = matrix_balance(a, separate=True)
+        assert b.size == 0
+        assert scale.size == 0
+        assert perm.size == 0
+
+        b_n, (scale_n, perm_n) = matrix_balance(a, separate=True)
+        assert b.dtype == b_n.dtype
+        assert scale.dtype == scale_n.dtype
+        assert perm.dtype == perm_n.dtype
+

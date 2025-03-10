@@ -1,42 +1,45 @@
 Index: scipy/doc/source/conf.py
 ===================================================================
---- scipy.orig/doc/source/conf.py	2024-02-04 09:52:36.749472401 +0100
-+++ scipy/doc/source/conf.py	2024-02-04 09:53:25.281895674 +0100
-@@ -46,11 +46,10 @@
-     'sphinx.ext.coverage',
-     'sphinx.ext.mathjax',
-     'numpydoc',
--    'sphinx_design',
-     'scipyoptdoc',
+--- scipy.orig/doc/source/conf.py	2024-12-02 18:19:59.859143223 +0100
++++ scipy/doc/source/conf.py	2024-12-02 18:19:59.855143186 +0100
+@@ -52,7 +52,7 @@
      'doi_role',
      'matplotlib.sphinxext.plot_directive',
--    'myst_nb',
-+#    'myst_nb',
+     'myst_nb',
+-    'jupyterlite_sphinx',
++#    'jupyterlite_sphinx',
  ]
  
  
-@@ -138,13 +137,14 @@
- # be strict about warnings in our examples, we should write clean code
- # (exceptions permitted for pedagogical purposes below)
- warnings.resetwarnings()
--warnings.filterwarnings('error')
-+warnings.filterwarnings('default')
- # allow these and show them
- warnings.filterwarnings('default', module='sphinx')  # internal warnings
- # global weird ones that can be safely ignored
- for key in (
-         r"OpenSSL\.rand is deprecated",  # OpenSSL package in linkcheck
-         r"distutils Version",  # distutils
-+        r"the imp module is deprecated",  # invoke (via pooch)
-         ):
-     warnings.filterwarnings(  # deal with other modules having bad imports
-         'ignore', message=".*" + key, category=DeprecationWarning)
-@@ -195,7 +195,7 @@
- html_theme_options = {
-   "github_url": "https://github.com/scipy/scipy",
-   "twitter_url": "https://twitter.com/SciPy_team",
--  "navbar_end": ["theme-switcher", "version-switcher", "navbar-icon-links"],
-+#  "navbar_end": ["theme-switcher", "version-switcher", "navbar-icon-links"],
-   "switcher": {
-       "json_url": "https://scipy.github.io/devdocs/_static/version_switcher.json",
-       "version_match": version,
+@@ -230,10 +230,10 @@
+     # and privacy-friendly analytics for the site. The dashboard can be accessed
+     # at https://analytics.scientific-python.org/docs.scipy.org
+     # The Scientific-Python community is hosting and managing the account.
+-    "analytics": {
+-        "plausible_analytics_domain": "docs.scipy.org",
+-        "plausible_analytics_url": "https://views.scientific-python.org/js/script.js",
+-    },
++#    "analytics": {
++#        "plausible_analytics_domain": "docs.scipy.org",
++#        "plausible_analytics_url": "https://views.scientific-python.org/js/script.js",
++#    },
+ }
+ 
+ if 'dev' in version:
+@@ -279,12 +279,12 @@
+ # Intersphinx configuration
+ # -----------------------------------------------------------------------------
+ intersphinx_mapping = {
+-    'python': ('https://docs.python.org/3', None),
+-    'numpy': ('https://numpy.org/devdocs', None),
++    'python': ('https://docs.python.org/3', ('/usr/share/doc/python3/html/objects.inv', None)),
++    'numpy': ('https://numpy.org/devdocs', ('/usr/share/doc/python-numpy/html/objects.inv', None)),
+     'neps': ('https://numpy.org/neps', None),
+-    'matplotlib': ('https://matplotlib.org/stable', None),
++    'matplotlib': ('https://matplotlib.org/stable', ('/usr/share/doc/python-matplotlib-doc/html/objects.inv', None)),
+     'asv': ('https://asv.readthedocs.io/en/stable/', None),
+-    'statsmodels': ('https://www.statsmodels.org/stable', None),
++    'statsmodels': ('https://www.statsmodels.org/stable', ('/usr/share/doc/python-statsmodels-doc/html/objects.inv', None)),
+ }
+ 
+ 

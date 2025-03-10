@@ -1,21 +1,8 @@
-Index: scipy/scipy/linalg/tests/test_solvers.py
-===================================================================
---- scipy.orig/scipy/linalg/tests/test_solvers.py	2024-02-08 00:27:40.321869432 +0100
-+++ scipy/scipy/linalg/tests/test_solvers.py	2024-02-08 00:27:40.305869383 +0100
-@@ -306,7 +306,7 @@
-     for ind, case in enumerate(cases):
-         _test_factory(case, min_decimal[ind])
- 
--
-+@pytest.mark.skip(reason="test fails, see https://github.com/scipy/scipy/issues/14517")
- def test_solve_discrete_are():
- 
-     cases = [
 Index: scipy/scipy/optimize/tests/test_optimize.py
 ===================================================================
---- scipy.orig/scipy/optimize/tests/test_optimize.py	2024-02-08 00:27:40.321869432 +0100
-+++ scipy/scipy/optimize/tests/test_optimize.py	2024-02-08 00:27:40.305869383 +0100
-@@ -1024,6 +1024,7 @@
+--- scipy.orig/scipy/optimize/tests/test_optimize.py	2024-11-21 15:05:10.043955002 +0100
++++ scipy/scipy/optimize/tests/test_optimize.py	2024-11-21 15:05:10.027954862 +0100
+@@ -1150,6 +1150,7 @@
  
              assert_allclose(v, self.func(self.solution), rtol=tol)
  
@@ -25,21 +12,21 @@ Index: scipy/scipy/optimize/tests/test_optimize.py
          sol = optimize.minimize(optimize.rosen, np.array([-1.2, 1.0]),
 Index: scipy/scipy/linalg/tests/test_lapack.py
 ===================================================================
---- scipy.orig/scipy/linalg/tests/test_lapack.py	2024-02-08 00:27:40.321869432 +0100
-+++ scipy/scipy/linalg/tests/test_lapack.py	2024-02-08 00:27:40.309869395 +0100
-@@ -1031,7 +1031,7 @@
+--- scipy.orig/scipy/linalg/tests/test_lapack.py	2024-11-21 15:05:10.043955002 +0100
++++ scipy/scipy/linalg/tests/test_lapack.py	2024-11-21 15:05:10.027954862 +0100
+@@ -1067,7 +1067,7 @@
  
-         eig, _, info = syevd(a)
+         eig, _, info = heevd(a)
          assert_(info == 0)
 -        assert_allclose(eig, eig_gvd, rtol=1e-4)
 +        assert_allclose(eig, eig_gvd, rtol=2e-4)
  
  
- def test_hegst():
+ def test_tzrzf():
 Index: scipy/scipy/interpolate/tests/test_fitpack.py
 ===================================================================
---- scipy.orig/scipy/interpolate/tests/test_fitpack.py	2024-02-08 00:27:40.321869432 +0100
-+++ scipy/scipy/interpolate/tests/test_fitpack.py	2024-02-08 00:27:40.309869395 +0100
+--- scipy.orig/scipy/interpolate/tests/test_fitpack.py	2024-11-21 15:05:10.043955002 +0100
++++ scipy/scipy/interpolate/tests/test_fitpack.py	2024-11-21 15:05:10.027954862 +0100
 @@ -6,6 +6,7 @@
                             assert_almost_equal, assert_array_almost_equal)
  from pytest import raises as assert_raises
@@ -58,17 +45,17 @@ Index: scipy/scipy/interpolate/tests/test_fitpack.py
  
 Index: scipy/scipy/optimize/tests/test_linprog.py
 ===================================================================
---- scipy.orig/scipy/optimize/tests/test_linprog.py	2024-02-08 00:27:40.321869432 +0100
-+++ scipy/scipy/optimize/tests/test_linprog.py	2024-02-08 00:27:40.309869395 +0100
-@@ -14,6 +14,7 @@
- from scipy.linalg import LinAlgWarning
+--- scipy.orig/scipy/optimize/tests/test_linprog.py	2024-11-21 15:05:10.043955002 +0100
++++ scipy/scipy/optimize/tests/test_linprog.py	2024-11-21 15:05:10.031954897 +0100
+@@ -15,6 +15,7 @@
+ from scipy._lib._util import VisibleDeprecationWarning
  import scipy.sparse
  import pytest
 +import platform
  
  has_umfpack = True
  try:
-@@ -608,6 +609,7 @@
+@@ -609,6 +610,7 @@
          if do_presolve:
              assert_equal(res.nit, 0)
  
@@ -78,8 +65,8 @@ Index: scipy/scipy/optimize/tests/test_linprog.py
          # Test ill-valued bounds (lower inf, upper -inf)
 Index: scipy/scipy/special/tests/test_round.py
 ===================================================================
---- scipy.orig/scipy/special/tests/test_round.py	2024-02-08 00:27:40.321869432 +0100
-+++ scipy/scipy/special/tests/test_round.py	2024-02-08 00:27:40.309869395 +0100
+--- scipy.orig/scipy/special/tests/test_round.py	2024-11-21 15:05:10.043955002 +0100
++++ scipy/scipy/special/tests/test_round.py	2024-11-21 15:05:10.031954897 +0100
 @@ -1,8 +1,14 @@
  import numpy as np
  import pytest
@@ -93,13 +80,13 @@ Index: scipy/scipy/special/tests/test_round.py
 +     machine=='parisc64' ):
 +    pytest.skip("rounding tests known to fail on armel, alpha and hppa", allow_module_level=True)
  
+ @pytest.mark.fail_slow(5)
  @pytest.mark.skipif(not _test_internal.have_fenv(), reason="no fenv()")
- def test_add_round_up():
 Index: scipy/scipy/stats/tests/test_stats.py
 ===================================================================
---- scipy.orig/scipy/stats/tests/test_stats.py	2024-02-08 00:27:40.321869432 +0100
-+++ scipy/scipy/stats/tests/test_stats.py	2024-02-08 00:27:40.313869408 +0100
-@@ -19,6 +19,7 @@
+--- scipy.orig/scipy/stats/tests/test_stats.py	2024-11-21 15:05:10.043955002 +0100
++++ scipy/scipy/stats/tests/test_stats.py	2024-11-21 15:05:10.035954931 +0100
+@@ -22,6 +22,7 @@
                             assert_array_less)
  import pytest
  from pytest import raises as assert_raises
@@ -107,7 +94,7 @@ Index: scipy/scipy/stats/tests/test_stats.py
  import numpy.ma.testutils as mat
  from numpy import array, arange, float32, float64, power
  import numpy as np
-@@ -546,6 +547,7 @@
+@@ -748,6 +749,7 @@
      [1] 1.701815e-09
      """
  
@@ -115,28 +102,10 @@ Index: scipy/scipy/stats/tests/test_stats.py
      def test_basic(self):
          fisher_exact = stats.fisher_exact
  
-@@ -6339,14 +6341,17 @@
-         with pytest.raises(ValueError, match='Invalid array input'):
-             stats.gstd('This should fail as it can not be cast to an array.')
- 
-+    @pytest.mark.skipif(platform.machine().startswith('arm'), reason="test known to fail on armel")
-     def test_raises_value_error_zero_entry(self):
-         with pytest.raises(ValueError, match='Non positive value'):
-             stats.gstd(np.append(self.array_1d, [0]))
- 
-+    @pytest.mark.skipif(platform.machine().startswith('arm'), reason="test known to fail on armel")
-     def test_raises_value_error_negative_entry(self):
-         with pytest.raises(ValueError, match='Non positive value'):
-             stats.gstd(np.append(self.array_1d, [-1]))
- 
-+    @pytest.mark.skipif(platform.machine().startswith('arm'), reason="test known to fail on armel")
-     def test_raises_value_error_inf_entry(self):
-         with pytest.raises(ValueError, match='Infinite value'):
-             stats.gstd(np.append(self.array_1d, [np.inf]))
 Index: scipy/scipy/signal/tests/test_spectral.py
 ===================================================================
---- scipy.orig/scipy/signal/tests/test_spectral.py	2024-02-08 00:27:40.321869432 +0100
-+++ scipy/scipy/signal/tests/test_spectral.py	2024-02-08 00:27:40.313869408 +0100
+--- scipy.orig/scipy/signal/tests/test_spectral.py	2024-11-21 15:05:10.043955002 +0100
++++ scipy/scipy/signal/tests/test_spectral.py	2024-11-21 15:05:10.035954931 +0100
 @@ -6,6 +6,7 @@
                             assert_array_almost_equal_nulp, suppress_warnings)
  import pytest
@@ -144,8 +113,8 @@ Index: scipy/scipy/signal/tests/test_spectral.py
 +import platform
  
  from scipy import signal
- from scipy.fft import fftfreq
-@@ -353,6 +354,7 @@
+ from scipy.fft import fftfreq, rfftfreq, fft, irfft
+@@ -360,6 +361,7 @@
                       detrend=lambda seg: signal.detrend(seg, axis=0, type='l'))
          assert_allclose(p, np.zeros_like(p), atol=1e-15)
  
@@ -153,7 +122,7 @@ Index: scipy/scipy/signal/tests/test_spectral.py
      def test_nd_axis_m1(self):
          x = np.arange(20, dtype=np.float64) + 0.04
          x = x.reshape((2,1,10))
-@@ -362,6 +364,7 @@
+@@ -369,6 +371,7 @@
          f0, p0 = welch(x[0,0,:], nperseg=10)
          assert_allclose(p0[np.newaxis,:], p[1,:], atol=1e-13, rtol=1e-13)
  
@@ -163,34 +132,18 @@ Index: scipy/scipy/signal/tests/test_spectral.py
          x = x.reshape((10,2,1))
 Index: scipy/scipy/spatial/transform/tests/test_rotation.py
 ===================================================================
---- scipy.orig/scipy/spatial/transform/tests/test_rotation.py	2024-02-08 00:27:40.321869432 +0100
-+++ scipy/scipy/spatial/transform/tests/test_rotation.py	2024-02-08 00:27:40.313869408 +0100
+--- scipy.orig/scipy/spatial/transform/tests/test_rotation.py	2024-11-21 15:05:10.043955002 +0100
++++ scipy/scipy/spatial/transform/tests/test_rotation.py	2024-11-21 15:05:10.035954931 +0100
 @@ -1,4 +1,5 @@
  import pytest
 +import platform
  
  import numpy as np
  from numpy.testing import assert_equal, assert_array_almost_equal
-@@ -1237,9 +1238,14 @@
- 
- 
- def test_align_vectors_single_vector():
-+    if platform.machine().startswith("i686"):
-+        # Test failing on 32-bit i386 (linux and hurd)
-+        eps = 3e-8
-+    else:
-+        eps = 1e-16
-     with pytest.warns(UserWarning, match="Optimal rotation is not"):
-         r_estimate, rmsd = Rotation.align_vectors([[1, -1, 1]], [[1, 1, -1]])
--        assert_allclose(rmsd, 0, atol=1e-16)
-+        assert_allclose(rmsd, 0, atol=eps)
- 
- 
- def test_align_vectors_invalid_input():
 Index: scipy/scipy/io/arff/tests/test_arffread.py
 ===================================================================
---- scipy.orig/scipy/io/arff/tests/test_arffread.py	2024-02-08 00:27:40.321869432 +0100
-+++ scipy/scipy/io/arff/tests/test_arffread.py	2024-02-08 00:27:40.313869408 +0100
+--- scipy.orig/scipy/io/arff/tests/test_arffread.py	2024-11-21 15:05:10.043955002 +0100
++++ scipy/scipy/io/arff/tests/test_arffread.py	2024-11-21 15:05:10.035954931 +0100
 @@ -6,10 +6,12 @@
  from io import StringIO
  
@@ -220,8 +173,8 @@ Index: scipy/scipy/io/arff/tests/test_arffread.py
          # The file nodata.arff has no data in the @DATA section.
 Index: scipy/scipy/linalg/tests/test_interpolative.py
 ===================================================================
---- scipy.orig/scipy/linalg/tests/test_interpolative.py	2024-02-08 00:27:40.321869432 +0100
-+++ scipy/scipy/linalg/tests/test_interpolative.py	2024-02-08 00:27:40.317869420 +0100
+--- scipy.orig/scipy/linalg/tests/test_interpolative.py	2024-11-21 15:05:10.043955002 +0100
++++ scipy/scipy/linalg/tests/test_interpolative.py	2024-11-21 15:05:10.039954967 +0100
 @@ -36,6 +36,7 @@
                             assert_array_equal)
  import pytest
@@ -240,28 +193,28 @@ Index: scipy/scipy/linalg/tests/test_interpolative.py
          B[:, 0] *= 1.2
 Index: scipy/scipy/fft/tests/test_fftlog.py
 ===================================================================
---- scipy.orig/scipy/fft/tests/test_fftlog.py	2024-02-08 00:27:40.321869432 +0100
-+++ scipy/scipy/fft/tests/test_fftlog.py	2024-02-08 00:27:40.317869420 +0100
-@@ -2,6 +2,7 @@
+--- scipy.orig/scipy/fft/tests/test_fftlog.py	2024-11-21 15:05:10.043955002 +0100
++++ scipy/scipy/fft/tests/test_fftlog.py	2024-11-21 15:05:10.039954967 +0100
+@@ -1,6 +1,7 @@
+ import warnings
  import numpy as np
- from numpy.testing import assert_allclose
  import pytest
 +import platform
  
  from scipy.fft._fftlog import fht, ifht, fhtoffset
  from scipy.special import poch
-@@ -99,6 +100,7 @@
-     assert_allclose(a, a_)
+@@ -108,6 +109,7 @@
+     xp_assert_close(a_, a, rtol=1.5e-7)
  
  
 +@pytest.mark.skipif(platform.machine().startswith('mips64'), reason="test known to fail on mips64el")
- def test_fht_special_cases():
+ def test_fht_special_cases(xp):
      rng = np.random.RandomState(3491349965)
  
 Index: scipy/scipy/sparse/csgraph/tests/test_shortest_path.py
 ===================================================================
---- scipy.orig/scipy/sparse/csgraph/tests/test_shortest_path.py	2024-02-08 00:27:40.321869432 +0100
-+++ scipy/scipy/sparse/csgraph/tests/test_shortest_path.py	2024-02-08 00:27:40.317869420 +0100
+--- scipy.orig/scipy/sparse/csgraph/tests/test_shortest_path.py	2024-11-21 15:05:10.043955002 +0100
++++ scipy/scipy/sparse/csgraph/tests/test_shortest_path.py	2024-11-21 15:05:10.039954967 +0100
 @@ -9,6 +9,7 @@
  import scipy.sparse
  from scipy.io import mmread
@@ -270,7 +223,7 @@ Index: scipy/scipy/sparse/csgraph/tests/test_shortest_path.py
  
  directed_G = np.array([[0, 3, 3, 0, 0],
                         [0, 0, 0, 2, 4],
-@@ -372,6 +373,7 @@
+@@ -378,6 +379,7 @@
      shortest_path(G, method=method)
  
  
@@ -280,9 +233,9 @@ Index: scipy/scipy/sparse/csgraph/tests/test_shortest_path.py
          shortest_path(np.array([[0, 1], [np.nan, 0]]))
 Index: scipy/scipy/stats/tests/test_distributions.py
 ===================================================================
---- scipy.orig/scipy/stats/tests/test_distributions.py	2024-02-08 00:27:40.321869432 +0100
-+++ scipy/scipy/stats/tests/test_distributions.py	2024-02-08 00:27:40.317869420 +0100
-@@ -3170,6 +3170,7 @@
+--- scipy.orig/scipy/stats/tests/test_distributions.py	2024-11-21 15:05:10.043955002 +0100
++++ scipy/scipy/stats/tests/test_distributions.py	2024-11-21 15:05:10.039954967 +0100
+@@ -3432,6 +3432,7 @@
          assert_(np.isfinite(s))
          assert_(not np.isfinite(k))
  
@@ -290,7 +243,7 @@ Index: scipy/scipy/stats/tests/test_distributions.py
      def test_moments_warnings(self):
          # no warnings should be generated for dfd = 2, 4, 6, 8 (div by zero)
          with warnings.catch_warnings():
-@@ -4873,7 +4874,7 @@
+@@ -5352,7 +5353,7 @@
              # for alpha = 1. for linux 32 bit optimize.bisect
              # has some issues for .01 and .99 percentile
              [
@@ -299,18 +252,3 @@ Index: scipy/scipy/stats/tests/test_distributions.py
                      (r['alpha'] == 1.) &
                      (not is_linux_32) &
                      np.isin(r['pct'], pct_range) &
-Index: scipy/scipy/stats/tests/test_resampling.py
-===================================================================
---- scipy.orig/scipy/stats/tests/test_resampling.py	2024-02-03 14:41:48.243979537 +0100
-+++ scipy/scipy/stats/tests/test_resampling.py	2024-02-08 00:29:19.362173955 +0100
-@@ -535,8 +535,8 @@
-     l = stats.bootstrap(**config, confidence_level=0.95, alternative='less')
-     g = stats.bootstrap(**config, confidence_level=0.95, alternative='greater')
- 
--    assert_equal(l.confidence_interval.high, t.confidence_interval.high)
--    assert_equal(g.confidence_interval.low, t.confidence_interval.low)
-+    assert_allclose(l.confidence_interval.high, t.confidence_interval.high)
-+    assert_allclose(g.confidence_interval.low, t.confidence_interval.low)
-     assert np.isneginf(l.confidence_interval.low)
-     assert np.isposinf(g.confidence_interval.high)
- 

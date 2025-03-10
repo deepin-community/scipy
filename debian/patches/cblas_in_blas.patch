@@ -1,8 +1,11 @@
-Index: scipy/scipy/meson.build
+From: Drew Parsons <dparsons@debian.org>
+Date: Fri, 14 Jul 2023 10:11:21 +0200
+Subject: cblas_in_blas
+
 ===================================================================
---- scipy.orig/scipy/meson.build	2023-07-01 10:03:36.094420573 +0200
-+++ scipy/scipy/meson.build	2023-07-14 10:09:27.571812709 +0200
-@@ -166,7 +166,10 @@
+--- scipy.orig/scipy/meson.build	2024-08-11 19:03:24.506978137 +0200
++++ scipy/scipy/meson.build	2024-08-11 19:03:24.498978047 +0200
+@@ -227,7 +227,10 @@
    # In the future, this should be done automatically for:
    #   `dependency('blas', modules: cblas)`
    # see https://github.com/mesonbuild/meson/pull/10921.

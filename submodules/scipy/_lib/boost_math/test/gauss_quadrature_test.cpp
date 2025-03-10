@@ -31,6 +31,10 @@
 #pragma warning(disable:4127)  // Conditional expression is constant
 #endif
 
+#if __has_include(<stdfloat>)
+#  include <stdfloat>
+#endif
+
 #if !defined(TEST1) && !defined(TEST2) && !defined(TEST3)
 #  define TEST1
 #  define TEST2
@@ -289,7 +293,12 @@ void test_ca()
     Real tol = expected_error<Points>(test_ca_error_id);
     Real L1;
 
-    auto f1 = [](const Real& x) { return atan(x)/(x*(x*x + 1)) ; };
+    auto f1 = [](const Real& x) { 
+      if (x == 0) {
+         return static_cast<Real>(1);
+      }
+      return atan(x)/(x*(x*x + 1)) ;
+    };
     Real Q = gauss<Real, Points>::integrate(f1, 0, 1, &L1);
     Real Q_expected = pi<Real>()*ln_two<Real>()/8 + catalan<Real>()*half<Real>();
     BOOST_CHECK_CLOSE_FRACTION(Q, Q_expected, tol);
@@ -411,6 +420,7 @@ void test_left_limit_infinite()
 template<class Complex>
 void test_complex_lambert_w()
 {
+    #ifndef BOOST_MATH_STANDALONE
     std::cout << "Testing that complex-valued integrands are integrated correctly by Gaussian quadrature on type " << boost::typeindex::type_id<Complex>().pretty_name() << "\n";
     typedef typename Complex::value_type Real;
     Real tol = 10e-9;
@@ -434,7 +444,6 @@ void test_complex_lambert_w()
     };
 
     //N[ProductLog[2+3*I], 150]
-    #ifndef BOOST_MATH_STANDALONE
     Complex Q = gauss<Real, 30>::integrate(lw, (Real) 0, pi<Real>());
     BOOST_CHECK_CLOSE_FRACTION(Q.real(), BOOST_MATH_TEST_VALUE(Real, 1.0900765344857908463017778267816696498710210863535777805644), tol);
     BOOST_CHECK_CLOSE_FRACTION(Q.imag(), BOOST_MATH_TEST_VALUE(Real, 0.5301397207748388014268602135741217419287056313827031782979), tol);
@@ -445,6 +454,24 @@ BOOST_AUTO_TEST_CASE(gauss_quadrature_test)
 {
   
 #ifdef TEST1
+
+#ifdef __STDCPP_FLOAT64_T__
+    test_linear<std::float64_t, 7>();
+    test_quadratic<std::float64_t, 7>();
+    test_ca<std::float64_t, 7>();
+    test_three_quadrature_schemes_examples<std::float64_t, 7>();
+    test_integration_over_real_line<std::float64_t, 7>();
+    test_right_limit_infinite<std::float64_t, 7>();
+    test_left_limit_infinite<std::float64_t, 7>();
+
+    test_linear<std::float64_t, 9>();
+    test_quadratic<std::float64_t, 9>();
+    test_ca<std::float64_t, 9>();
+    test_three_quadrature_schemes_examples<std::float64_t, 9>();
+    test_integration_over_real_line<std::float64_t, 9>();
+    test_right_limit_infinite<std::float64_t, 9>();
+    test_left_limit_infinite<std::float64_t, 9>();
+#else
     test_linear<double, 7>();
     test_quadratic<double, 7>();
     test_ca<double, 7>();
@@ -460,6 +487,7 @@ BOOST_AUTO_TEST_CASE(gauss_quadrature_test)
     test_integration_over_real_line<double, 9>();
     test_right_limit_infinite<double, 9>();
     test_left_limit_infinite<double, 9>();
+#endif
 
 #if LDBL_MANT_DIG < 100 && defined(BOOST_MATH_RUN_MP_TESTS)
     test_linear<cpp_bin_float_quad, 10>();
