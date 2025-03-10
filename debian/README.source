@@ -17,3 +17,9 @@ Submodule source is generated strictly for the indicated version
 if the git tag v$VERSION is available, otherwise git HEAD is used.
 
 Script Usage:  get-submodules [VERSION]
+
+
+=== debian/scipy_doc ===
+
+version_switcher.json is used to build docs and is downloaded from
+https://scipy.github.io/devdocs/_static/version_switcher.json

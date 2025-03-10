@@ -7,10 +7,10 @@ Subject: Don't treat warnings as errors in pytest
  1 file changed, 1 deletion(-)
 
 diff --git a/pytest.ini b/pytest.ini
-index a4deb42..3438da8 100644
+index 78f65a4..d794686 100644
 --- a/pytest.ini
 +++ b/pytest.ini
-@@ -3,7 +3,6 @@ addopts = -l
+@@ -4,7 +4,6 @@ norecursedirs = doc tools scipy/_lib/array_api_compat scipy/_lib/highs
  junit_family=xunit2
  
  filterwarnings =

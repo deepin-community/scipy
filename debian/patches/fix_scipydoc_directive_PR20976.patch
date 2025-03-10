@@ -1,0 +1,44 @@
+From ad1652e03527476b622e75d95d610b639c206e43 Mon Sep 17 00:00:00 2001
+From: M Bussonnier <bussonniermatthias@gmail.com>
+Date: Mon, 17 Jun 2024 13:07:10 +0200
+Subject: [PATCH] BUG: Update scipy-optimise directive in view of new default
+ role.
+
+There is some work being done to update the default role from autolink
+to something more generic like py:obj or any, this is not yet possible
+as those do not yet cross-reference parameters.
+
+Nonetheless if one tries to change the default role, sphinx choke on
+some docutils node sources as the parent was improperly set.
+
+This small patch should fix it by using the parent kwarg, and also using
+a  more specific subclass.
+
+See https://github.com/sphinx-doc/sphinx/issues/12429
+---
+ doc/source/scipyoptdoc.py | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/doc/source/scipyoptdoc.py b/doc/source/scipyoptdoc.py
+index 14f32454b471..3bf08c5d7efe 100644
+--- a/doc/source/scipyoptdoc.py
++++ b/doc/source/scipyoptdoc.py
+@@ -30,7 +30,7 @@
+     raise RuntimeError("Sphinx 1.0.1 or newer is required")
+ 
+ from numpydoc.numpydoc import mangle_docstrings
+-from docutils.statemachine import ViewList
++from docutils.statemachine import StringList
+ from sphinx.domains.python import PythonDomain
+ from scipy._lib._util import getfullargspec_no_self
+ 
+@@ -149,7 +149,8 @@ def remove_arg(arg):
+                     new_lines.append(':Options:')
+                 else:
+                     new_lines.append(line)
+-            self.content = ViewList(new_lines, self.content.parent)
++
++            self.content = StringList(new_lines, parent=self.content.parent)
+             return base_directive.run(self)
+ 
+         option_spec = dict(base_directive.option_spec)

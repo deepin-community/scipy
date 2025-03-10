@@ -1,0 +1,14 @@
+Index: scipy/scipy/special/meson.build
+===================================================================
+--- scipy.orig/scipy/special/meson.build	2024-11-21 21:49:57.575911108 +0100
++++ scipy/scipy/special/meson.build	2024-11-21 22:03:44.304810128 +0100
+@@ -33,7 +33,8 @@
+   scipy_import_dll_args = []
+ endif
+ 
+-sf_error_state_lib = shared_library('sf_error_state',
++sf_error_state_lib = shared_library('sf_error_state'
++    + '.' + py3.get_variable('SOABI'),
+   ['sf_error_state.c'],
+   include_directories: ['../_lib', '../_build_utils/src'],
+   c_args: scipy_export_dll_args,

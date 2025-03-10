@@ -15,7 +15,8 @@ windowsglobalimage="cppalliance/dronevs2019"
 
 def main(ctx):
 
-  things_to_test = [ "special_fun", "distribution_tests", "mp", "misc", "interpolators", "quadrature", "autodiff", "long-running-tests", "float128_tests" ]
+  things_to_test = [ "special_fun", "distribution_tests", "mp", "misc", "interpolators", "quadrature", "autodiff", "long-running-tests", "float128_tests", "concepts" ]
+  gcc13_things_to_test = [ "special_fun", "distribution_tests", "mp", "misc", "interpolators", "quadrature", "autodiff", "long-running-tests", "float128_tests", "concepts", "new_floats" ]
   sanitizer_test = [ "special_fun", "distribution_tests", "misc", "interpolators", "quadrature", "float128_tests" ]
   gnu_5_stds = [ "gnu++14", "c++14" ]
   gnu_6_stds = [ "gnu++14", "c++14", "gnu++17", "c++17" ]
@@ -23,6 +24,7 @@ def main(ctx):
   gnu_9_stds = [ "gnu++14", "c++14", "gnu++17", "c++17", "gnu++2a", "c++2a" ]
   clang_10_stds = [ "c++14", "c++17", "c++2a" ]
   gnu_non_native = [ "gnu++17" ]
+  gcc13_stds = [ "c++23" ]
 
   result = []
 
@@ -30,10 +32,10 @@ def main(ctx):
     #
     # Sanitizers:
     #
-    result.append(linux_cxx("Ubuntu g++-10 C++2a ASAN" + " " + suite, "g++-10", packages="g++-10", privileged=True, buildtype="boost", image="cppalliance/droneubuntu2004:1", environment={'TOOLSET': 'gcc', 'COMPILER': 'g++-10', 'CXXSTD': 'gnu++2a', 'TEST_SUITE': suite, 'OPTIONS': '<cxxflags>-fsanitize=address <linkflags>-fsanitize=address <cxxflags>-DBOOST_CI_SANITIZER_BUILD' }, globalenv=globalenv))
-    result.append(linux_cxx("Ubuntu g++-10 C++2a USAN" + " " + suite, "g++-10", packages="g++-10", privileged=True, buildtype="boost", image="cppalliance/droneubuntu2004:1", environment={'TOOLSET': 'gcc', 'COMPILER': 'g++-10', 'CXXSTD': 'gnu++2a', 'TEST_SUITE': suite, 'OPTIONS': '<cxxflags>-fsanitize=undefined <linkflags>-fsanitize=undefined <cxxflags>-DBOOST_CI_SANITIZER_BUILD' }, globalenv=globalenv))
-    result.append(linux_cxx("Ubuntu g++-10 C++2a TSAN" + " " + suite, "g++-10", packages="g++-10", privileged=True, buildtype="boost", image="cppalliance/droneubuntu2004:1", environment={'TOOLSET': 'gcc', 'COMPILER': 'g++-10', 'CXXSTD': 'gnu++2a', 'TEST_SUITE': suite, 'OPTIONS': '<cxxflags>-fsanitize=thread <linkflags>-fsanitize=thread <cxxflags>-DBOOST_CI_SANITIZER_BUILD' }, globalenv=globalenv))
-    result.append(linux_cxx("Ubuntu clang++-10 C++2a ISAN" + " " + suite, "clang++-10", packages="clang-10", privileged=True, buildtype="boost", image="cppalliance/droneubuntu2004:1", environment={'TOOLSET': 'clang', 'COMPILER': 'clang++-10', 'CXXSTD': 'gnu++2a', 'TEST_SUITE': suite, 'OPTIONS': '<cxxflags>-fsanitize=integer <linkflags>-fsanitize=integer' }, globalenv=globalenv))
+    result.append(linux_cxx("Ubuntu g++-12 C++20 ASAN" + " " + suite, "g++-12", packages="g++-12", privileged=True, buildtype="boost", image="cppalliance/droneubuntu2204:1", environment={'TOOLSET': 'gcc', 'COMPILER': 'g++-12', 'CXXSTD': 'gnu++20', 'TEST_SUITE': suite, 'OPTIONS': '<cxxflags>-fsanitize=address <linkflags>-fsanitize=address <cxxflags>-DBOOST_CI_SANITIZER_BUILD' }, globalenv=globalenv))
+    result.append(linux_cxx("Ubuntu g++-12 C++20 USAN" + " " + suite, "g++-12", packages="g++-12", privileged=True, buildtype="boost", image="cppalliance/droneubuntu2204:1", environment={'TOOLSET': 'gcc', 'COMPILER': 'g++-12', 'CXXSTD': 'gnu++20', 'TEST_SUITE': suite, 'OPTIONS': '<cxxflags>-fsanitize=undefined <linkflags>-fsanitize=undefined <cxxflags>-DBOOST_CI_SANITIZER_BUILD' }, globalenv=globalenv))
+    result.append(linux_cxx("Ubuntu g++-12 C++20 TSAN" + " " + suite, "g++-12", packages="g++-12", privileged=True, buildtype="boost", image="cppalliance/droneubuntu2204:1", environment={'TOOLSET': 'gcc', 'COMPILER': 'g++-12', 'CXXSTD': 'gnu++20', 'TEST_SUITE': suite, 'OPTIONS': '<cxxflags>-fsanitize=thread <linkflags>-fsanitize=thread <cxxflags>-DBOOST_CI_SANITIZER_BUILD' }, globalenv=globalenv))
+    result.append(linux_cxx("Ubuntu clang++-14 C++20 ISAN" + " " + suite, "clang++-14", packages="clang-14", privileged=True, buildtype="boost", image="cppalliance/droneubuntu2204:1", environment={'TOOLSET': 'clang', 'COMPILER': 'clang++-14', 'CXXSTD': 'gnu++20', 'TEST_SUITE': suite, 'OPTIONS': '<cxxflags>-fsanitize=integer <linkflags>-fsanitize=integer' }, globalenv=globalenv))
 
   for suite in things_to_test:
     for cxx in gnu_5_stds:
@@ -59,6 +61,9 @@ def main(ctx):
       result.append(linux_cxx("Ubuntu g++ ARM64" + cxx + " " + suite, "g++", packages="g++", buildtype="boost", image="cppalliance/droneubuntu2204:multiarch", arch="arm64", environment={'TOOLSET': 'gcc', 'COMPILER': 'g++', 'CXXSTD': cxx, 'TEST_SUITE': suite, }, globalenv=globalenv))
     for cxx in gnu_non_native:
       result.append(osx_cxx("M1 Clang " + cxx + " " + suite, "clang++", buildscript="drone", buildtype="boost", xcode_version="14.1", environment={'TOOLSET': 'clang', 'CXXSTD': cxx, 'TEST_SUITE': suite, 'DEFINE': 'BOOST_MATH_NO_REAL_CONCEPT_TESTS,BOOST_MATH_NO_LONG_DOUBLE_MATH_FUNCTIONS,BOOST_MATH_MULTI_ARCH_CI_RUN', }, globalenv=globalenv))
+  for suite in gcc13_things_to_test:
+    for cxx in gcc13_stds:
+      result.append(linux_cxx("Ubuntu g++-13 " + cxx + " " + suite, "g++-13", packages="g++-13", buildtype="boost", image="cppalliance/droneubuntu2304:1", environment={'TOOLSET': 'gcc', 'COMPILER': 'g++-13', 'CXXSTD': cxx, 'TEST_SUITE': suite, }, globalenv=globalenv))
 
   return result
 

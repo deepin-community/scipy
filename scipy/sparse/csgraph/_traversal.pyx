@@ -75,10 +75,13 @@ def connected_components(csgraph, directed=True, connection='weak',
     ... ]
     >>> graph = csr_matrix(graph)
     >>> print(graph)
-      (0, 1)	1
-      (0, 2)	1
-      (1, 2)	1
-      (3, 4)	1
+    <Compressed Sparse Row sparse matrix of dtype 'int64'
+    	with 4 stored elements and shape (5, 5)>
+    	Coords	Values
+    	(0, 1)	1
+    	(0, 2)	1
+    	(1, 2)	1
+    	(3, 4)	1
 
     >>> n_components, labels = connected_components(csgraph=graph, directed=False, return_labels=True)
     >>> n_components
@@ -149,6 +152,11 @@ def breadth_first_tree(csgraph, i_start, directed=True):
         The N x N directed compressed-sparse representation of the breadth-
         first tree drawn from csgraph, starting at the specified node.
 
+    Notes
+    -----
+    If multiple valid solutions are possible, output may vary with SciPy and
+    Python version.
+
     Examples
     --------
     The following example shows the computation of a depth-first tree
@@ -185,7 +193,7 @@ def breadth_first_tree(csgraph, i_start, directed=True):
     the graph.  A breadth-first tree from a given node is unique.
     """
     _node_list, predecessors = breadth_first_order(csgraph, i_start,
-                                                  directed, True)
+                                                   directed, True)
     return reconstruct_path(csgraph, predecessors, directed)
 
 
@@ -219,6 +227,11 @@ def depth_first_tree(csgraph, i_start, directed=True):
     cstree : csr matrix
         The N x N directed compressed-sparse representation of the depth-
         first tree drawn from csgraph, starting at the specified node.
+
+    Notes
+    -----
+    If multiple valid solutions are possible, output may vary with SciPy and
+    Python version.
 
     Examples
     --------
@@ -259,7 +272,7 @@ def depth_first_tree(csgraph, i_start, directed=True):
     been different.
     """
     _node_list, predecessors = depth_first_order(csgraph, i_start,
-                                                directed, True)
+                                                 directed, True)
     return reconstruct_path(csgraph, predecessors, directed)
 
 
@@ -289,7 +302,7 @@ cpdef breadth_first_order(csgraph, i_start,
         algorithm can progress from point i to j along csgraph[i, j] or
         csgraph[j, i].
     return_predecessors : bool, optional
-        If True (default), then return the predecesor array (see below).
+        If True (default), then return the predecessor array (see below).
 
     Returns
     -------
@@ -304,6 +317,11 @@ cpdef breadth_first_order(csgraph, i_start,
         predecessors[i]. If node i is not in the tree (and for the parent
         node) then predecessors[i] = -9999.
 
+    Notes
+    -----
+    If multiple valid solutions are possible, output may vary with SciPy and
+    Python version.
+
     Examples
     --------
     >>> from scipy.sparse import csr_matrix
@@ -317,11 +335,14 @@ cpdef breadth_first_order(csgraph, i_start,
     ... ]
     >>> graph = csr_matrix(graph)
     >>> print(graph)
-      (0, 1)    1
-      (0, 2)    2
-      (1, 3)    1
-      (2, 0)    2
-      (2, 3)    3
+    <Compressed Sparse Row sparse matrix of dtype 'int64'
+    	with 5 stored elements and shape (4, 4)>
+    	Coords	Values
+    	(0, 1)	1
+    	(0, 2)	2
+    	(1, 3)	1
+    	(2, 0)	2
+    	(2, 3)	3
 
     >>> breadth_first_order(graph,0)
     (array([0, 1, 2, 3], dtype=int32), array([-9999,     0,     0,     1], dtype=int32))
@@ -490,7 +511,7 @@ cpdef depth_first_order(csgraph, i_start,
         algorithm can progress from point i to j along csgraph[i, j] or
         csgraph[j, i].
     return_predecessors : bool, optional
-        If True (default), then return the predecesor array (see below).
+        If True (default), then return the predecessor array (see below).
 
     Returns
     -------
@@ -505,6 +526,11 @@ cpdef depth_first_order(csgraph, i_start,
         predecessors[i]. If node i is not in the tree (and for the parent
         node) then predecessors[i] = -9999.
 
+    Notes
+    -----
+    If multiple valid solutions are possible, output may vary with SciPy and
+    Python version.
+
     Examples
     --------
     >>> from scipy.sparse import csr_matrix
@@ -518,11 +544,14 @@ cpdef depth_first_order(csgraph, i_start,
     ... ]
     >>> graph = csr_matrix(graph)
     >>> print(graph)
-      (0, 1)	1
-      (0, 2)	2
-      (1, 3)	1
-      (2, 0)	2
-      (2, 3)	3
+    <Compressed Sparse Row sparse matrix of dtype 'int64'
+    	with 5 stored elements and shape (4, 4)>
+    	Coords	Values
+    	(0, 1)	1
+    	(0, 2)	2
+    	(1, 3)	1
+    	(2, 0)	2
+    	(2, 3)	3
 
     >>> depth_first_order(graph,0)
     (array([0, 1, 3, 2], dtype=int32), array([-9999,     0,     0,     1], dtype=int32))

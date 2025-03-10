@@ -1,0 +1,33 @@
+Index: scipy/scipy/__init__.py
+===================================================================
+--- scipy.orig/scipy/__init__.py	2024-11-22 00:35:32.335270546 +0100
++++ scipy/scipy/__init__.py	2024-11-22 00:36:07.955588197 +0100
+@@ -43,12 +43,14 @@
+ """
+ 
+ import importlib as _importlib
++import sysconfig as _sysconfig
+ 
+ from numpy import __version__ as __numpy_version__
+ 
+ 
+ try:
+-    from scipy.__config__ import show as show_config
++    __config__ = _importlib.import_module('scipy.__config__' + _sysconfig.get_config_var('SOABI') + '__')
++    show_config = getattr(__config__, 'show')
+ except ImportError as e:
+     msg = """Error importing SciPy: you cannot import SciPy while
+     being in scipy source directory; please exit the SciPy source
+Index: scipy/scipy/meson.build
+===================================================================
+--- scipy.orig/scipy/meson.build	2024-11-22 00:35:32.335270546 +0100
++++ scipy/scipy/meson.build	2024-11-22 00:35:32.335270546 +0100
+@@ -549,7 +549,7 @@
+ 
+ configure_file(
+   input: '__config__.py.in',
+-  output: '__config__.py',
++  output: '__config__' + py3.get_variable('SOABI') + '__.py',
+   configuration : conf_data,
+   install_dir: scipy_dir,
+   install_tag: 'python-runtime',

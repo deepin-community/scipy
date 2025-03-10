@@ -1,0 +1,94 @@
+Author: Aurelien Jarno <aurel32@debian.org>
+Description: check if numbers are finite before conversion to int, and if not return 0
+Date: Tue, 19 Nov 2024 23:24:28 +0100
+Forwarded: not-needed
+Bug-Debian: https://bugs.debian.org/1086108
+
+Upstream fixed this in a different way as part of a larger rewrite:
+https://github.com/scipy/scipy/pull/21553
+
+--- a/scipy/linalg/_matfuncs_expm.pyx.in
++++ b/scipy/linalg/_matfuncs_expm.pyx.in
+@@ -11,7 +11,7 @@
+ cimport numpy as cnp
+ import numpy as np
+ from libc.stdlib cimport malloc, free
+-from libc.math cimport fabs, ceil, log2, pow
++from libc.math cimport fabs, ceil, log2, pow, isfinite
+ from scipy.linalg.cython_lapack cimport (sgetrf, sgetrs, dgetrf, dgetrs,
+                                          cgetrf, cgetrs, zgetrf, zgetrs)
+ from scipy.linalg.cython_blas cimport (sgemm, saxpy, sscal, scopy, sgemv,
+@@ -106,6 +106,7 @@
+         double temp
+         double [5] theta
+         double [5] coeff
++        double d
+         numpy_lapack_t [:, :, ::1] Amv = Am
+ 
+     dims[0] = n
+@@ -150,7 +151,9 @@
+         np.matmul(absA, work_arr, out=work_arr)
+     temp = np.max(work_arr)
+ 
+-    lm = max(<int>ceil(log2(temp/normA/coeff[0])/6), 0)
++    # emulate the x86 behaviour for non-finite numbers
++    d = ceil(log2(temp/normA/coeff[0])/6)
++    lm = max(<int>d, 0) if isfinite(d) else 0
+     if eta0 < theta[0] and lm == 0:
+         return 3, s
+ 
+@@ -161,7 +164,9 @@
+         np.matmul(absA, work_arr, out=work_arr)
+     temp = np.max(work_arr)
+ 
+-    lm = max(<int>ceil(log2(temp/normA/coeff[1])/10), 0)
++    # emulate the x86 behaviour for non-finite numbers
++    d = ceil(log2(temp/normA/coeff[1])/10)
++    lm = max(<int>d, 0) if isfinite(d) else 0
+     if eta1 < theta[1] and lm == 0:
+         return 5, s
+ 
+@@ -180,7 +185,9 @@
+         np.matmul(absA, work_arr, out=work_arr)
+     temp = np.max(work_arr)
+ 
+-    lm = max(<int>ceil(log2(temp/normA/coeff[2])/14), 0)
++    # emulate the x86 behaviour for non-finite numbers
++    d = <int>ceil(log2(temp/normA/coeff[2])/14)
++    lm = max(<int>d, 0) if isfinite(d) else 0
+     if eta2 < theta[2] and lm == 0:
+         return 7, s
+ 
+@@ -191,7 +198,9 @@
+         np.matmul(absA, work_arr, out=work_arr)
+     temp = np.max(work_arr)
+ 
+-    lm = max(<int>ceil(log2(temp/normA/coeff[3])/18), 0)
++    # emulate the x86 behaviour for non-finite numbers
++    d = ceil(log2(temp/normA/coeff[3])/18)
++    lm = max(<int>d, 0) if isfinite(d) else 0
+     if eta2 < theta[3] and lm == 0:
+         return 9, s
+ 
+@@ -206,7 +215,9 @@
+ 
+     eta3 = max(d8, d10)
+     eta4 = min(eta2, eta3)
+-    s = max(<int>ceil(log2(eta4/theta[4])), 0)
++    # emulate the x86 behaviour for non-finite numbers
++    d = ceil(log2(eta4/theta[4]))
++    s = max(<int>d, 0) if isfinite(d) else 0
+     if s != 0:
+         two_pow_s = 2.** (-s)
+         absA *= two_pow_s
+@@ -221,7 +232,9 @@
+         np.matmul(absA, work_arr, out=work_arr)
+     temp = np.max(work_arr)
+ 
+-    s += max(<int>ceil(log2(temp/normA/coeff[4])/26), 0)
++    # emulate the x86 behaviour for non-finite numbers
++    d = ceil(log2(temp/normA/coeff[4])/26)
++    s += max(<int>d, 0) if isfinite(d) else 0
+     return 13, s
+ 
+ # ============================================================================

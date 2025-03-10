@@ -1,6 +1,8 @@
---- a/scipy/special/_round.h
-+++ b/scipy/special/_round.h
-@@ -68,5 +68,12 @@ int fegetround()
+Index: scipy/scipy/special/_round.h
+===================================================================
+--- scipy.orig/scipy/special/_round.h	2024-08-11 19:03:08.918803954 +0200
++++ scipy/scipy/special/_round.h	2024-08-11 19:03:08.910803865 +0200
+@@ -79,5 +79,12 @@
  
  #endif
  

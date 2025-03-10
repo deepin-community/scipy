@@ -12,7 +12,7 @@ from scipy.interpolate import RectBivariateSpline
 
 from scipy.interpolate._fitpack_py import (splrep, splev, bisplrep, bisplev,
      sproot, splprep, splint, spalde, splder, splantider, insert, dblint)
-from scipy.interpolate.dfitpack import regrid_smth
+from scipy.interpolate._dfitpack import regrid_smth
 from scipy.interpolate._fitpack2 import dfitpack_int
 
 
@@ -204,7 +204,7 @@ class TestSplev:
         z = splev(t, tck)
         z0 = splev(t[0], tck)
         z1 = splev(t[1], tck)
-        assert_equal(z, np.row_stack((z0, z1)))
+        assert_equal(z, np.vstack((z0, z1)))
 
     def test_extrapolation_modes(self):
         # test extrapolation modes
@@ -231,7 +231,7 @@ class TestSplder:
         self.spl = splrep(x, y)
 
         # double check that knots are non-uniform
-        assert_(np.diff(self.spl[0]).ptp() > 0)
+        assert_(np.ptp(np.diff(self.spl[0])) > 0)
 
     def test_inverse(self):
         # Check that antiderivative + derivative is identity.
@@ -357,7 +357,8 @@ class TestBisplrep:
 
     def test_regression_1310(self):
         # Regression test for gh-1310
-        data = np.load(data_file('bug-1310.npz'))['data']
+        with np.load(data_file('bug-1310.npz')) as loaded_data:
+            data = loaded_data['data']
 
         # Shouldn't crash -- the input data triggers work array sizes
         # that caused previously some data to not be aligned on

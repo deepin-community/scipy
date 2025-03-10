@@ -1,5 +1,4 @@
 use_local_mathjax.patch
-qhull-lfs.patch
 Use-system-LBFGSB.patch
 hppa-boost-long-double-config.patch
 manage_tests.patch
@@ -7,7 +6,10 @@ build_sh4_FE.patch
 0008-Don-t-treat-warnings-as-errors-in-pytest.patch
 0009-Remove-some-documentation-referencing-the-source.patch
 0010-Allow-test_svds_parameter_k_which-to-fail-on-armel.patch
-0018-Drop-intersphinx.patch
-manage_docs.patch
-docs_privacy.patch
 cblas_in_blas.patch
+manage_docs.patch
+quadpack_C_PR21201.patch
+fix_scipydoc_directive_PR20976.patch
+special_libsf_error_SOABI.patch
+scipy_config_SOABI.patch
+scipy-ub-float-to-int.patch
