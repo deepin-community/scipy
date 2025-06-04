@@ -9,6 +9,8 @@ export FFLAGS="-fPIC"
 export ATLAS=None
 export PATH := $(CURDIR)/debian/extra_bin:$(PATH)
 export SCIPY_USE_PYTHRAN=0
+# Fix doc build
+export GITVER=Unknown
 
 PY3VERS:= $(shell py3versions -v -s)
 PY3_DEFAULT:= $(shell py3versions -dv)
