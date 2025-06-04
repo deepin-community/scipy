@@ -1,3 +1,9 @@
+scipy (1.11.4-10deepin1) unstable; urgency=medium
+
+  * feat: add sw64 support.
+
+ -- hudeng <hudeng@deepin.org>  Wed, 04 Jun 2025 17:31:15 +0800
+
 scipy (1.11.4-10deepin0) unstable; urgency=medium
 
   * No source change upload against GCC 12.
