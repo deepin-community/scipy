@@ -13,3 +13,4 @@ fix_scipydoc_directive_PR20976.patch
 special_libsf_error_SOABI.patch
 scipy_config_SOABI.patch
 scipy-ub-float-to-int.patch
+0001-deepin-sw_64-support.diff
